@@ -425,10 +425,8 @@ var Tooltip = function Tooltip(_ref) {
 
   useEffect(function () {
     if (tooltipRef.current) {
-      var tooltipHeight = tooltipRef.current.offsetHeight * 1.1;
       var tooltipWidth = tooltipRef.current.offsetWidth * 1.1;
       var newRelatedY = task.index * rowHeight - scrollY + headerHeight - 200;
-      console.log("tu0");
       var newRelatedX;
 
       if (rtl) {
@@ -443,7 +441,6 @@ var Tooltip = function Tooltip(_ref) {
         if (tooltipLeftmostPoint > svgContainerWidth) {
           newRelatedX = svgContainerWidth - tooltipWidth;
           newRelatedY += rowHeight;
-          console.log("tu1");
         }
       } else {
         newRelatedX = task.x2 + arrowIndent * 1.5 + taskListWidth - scrollX;
@@ -459,19 +456,9 @@ var Tooltip = function Tooltip(_ref) {
         if (newRelatedX < taskListWidth) {
           newRelatedX = svgContainerWidth + taskListWidth - tooltipWidth;
           newRelatedY += rowHeight;
-          console.log("tu2");
         }
       }
 
-      var tooltipLowerPoint = tooltipHeight + newRelatedY - scrollY;
-
-      if (tooltipLowerPoint > svgContainerHeight - scrollY) {
-        console.log("tu3");
-      }
-
-      console.log(svgContainerHeight);
-      console.log("INDEX", task.index, "ROW HEIGHT: ", rowHeight - scrollY + headerHeight);
-      console.log(newRelatedX, newRelatedY);
       setRelatedY(newRelatedY);
       setRelatedX(newRelatedX);
     }
@@ -867,8 +854,6 @@ var Calendar = function Calendar(_ref) {
 
     for (var i = 0; i < dates.length; i++) {
       var date = dates[i];
-      console.log(date);
-      console.log(getLocalDayOfWeek(date, locale, "short"));
       var bottomValue = date.toLocaleDateString(locale, {
         day: '2-digit',
         month: '2-digit'
