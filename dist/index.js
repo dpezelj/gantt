@@ -2113,7 +2113,7 @@ var TaskGanttContent = function TaskGanttContent(_ref) {
   })));
 };
 
-var styles$9 = {"ganttVerticalContainer":"_CZjuD","horizontalContainer":"_2B2zv","wrapper":"_3eULf"};
+var styles$9 = {"ganttVerticalContainer":"_CZjuD","ganttVerticalContainerChanged":"_15X0H","horizontalContainer":"_2B2zv","horizontalContainerChanged":"_1zqJ8","wrapper":"_3eULf"};
 
 var TaskGantt = function TaskGantt(_ref) {
   var gridProps = _ref.gridProps,
@@ -2141,7 +2141,7 @@ var TaskGantt = function TaskGantt(_ref) {
     }
   }, [scrollX]);
   return React__default.createElement("div", {
-    className: styles$9.ganttVerticalContainer,
+    className: styles$9.ganttVerticalContainerChanged,
     ref: verticalGanttContainerRef,
     dir: "ltr"
   }, React__default.createElement("svg", {
@@ -2165,36 +2165,6 @@ var TaskGantt = function TaskGantt(_ref) {
     fontFamily: barProps.fontFamily,
     ref: ganttSVGRef
   }, React__default.createElement(Grid, Object.assign({}, gridProps)), React__default.createElement(TaskGanttContent, Object.assign({}, newBarProps)))));
-};
-
-var styles$a = {"scrollWrapper":"_2k9Ys","scroll":"_19jgW"};
-
-var HorizontalScroll = function HorizontalScroll(_ref) {
-  var scroll = _ref.scroll,
-      svgWidth = _ref.svgWidth,
-      taskListWidth = _ref.taskListWidth,
-      rtl = _ref.rtl,
-      onScroll = _ref.onScroll;
-  var scrollRef = React.useRef(null);
-  React.useEffect(function () {
-    if (scrollRef.current) {
-      scrollRef.current.scrollLeft = scroll;
-    }
-  }, [scroll]);
-  return React__default.createElement("div", {
-    dir: "ltr",
-    style: {
-      margin: rtl ? "0px " + taskListWidth + "px 0px 0px" : "0px 0px 0px " + taskListWidth + "px"
-    },
-    className: styles$a.scrollWrapper,
-    onScroll: onScroll,
-    ref: scrollRef
-  }, React__default.createElement("div", {
-    style: {
-      width: svgWidth
-    },
-    className: styles$a.scroll
-  }));
 };
 
 var Gantt = function Gantt(_ref) {
@@ -2492,15 +2462,6 @@ var Gantt = function Gantt(_ref) {
     }
   };
 
-  var handleScrollX = function handleScrollX(event) {
-    if (scrollX !== event.currentTarget.scrollLeft && !ignoreScrollEvent) {
-      setScrollX(event.currentTarget.scrollLeft);
-      setIgnoreScrollEvent(true);
-    } else {
-      setIgnoreScrollEvent(false);
-    }
-  };
-
   var handleKeyDown = function handleKeyDown(event) {
     event.preventDefault();
     var newScrollY = scrollY;
@@ -2676,13 +2637,7 @@ var Gantt = function Gantt(_ref) {
     scroll: scrollY,
     onScroll: handleScrollY,
     rtl: rtl
-  })), React__default.createElement(HorizontalScroll, {
-    svgWidth: svgWidth,
-    taskListWidth: taskListWidth,
-    scroll: scrollX,
-    rtl: rtl,
-    onScroll: handleScrollX
-  }));
+  })));
 };
 
 exports.Gantt = Gantt;
