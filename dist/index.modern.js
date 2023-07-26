@@ -1,6 +1,8 @@
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Tooltip, tooltipClasses, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -18,6 +20,21 @@ function _extends() {
   };
 
   return _extends.apply(this, arguments);
+}
+
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
 }
 
 function _unsupportedIterableToArray(o, minLen) {
@@ -476,139 +493,7 @@ var TaskListTableDefault = function TaskListTableDefault(_ref) {
   }));
 };
 
-var styles$2 = {"tooltipDefaultContainer":"_3T42e","tooltipDefaultContainerParagraph":"_29NTg","tooltipDetailsContainer":"_25P-K","tooltipDetailsContainerHidden":"_3gVAq"};
-
-var Tooltip = function Tooltip(_ref) {
-  var task = _ref.task,
-      rowHeight = _ref.rowHeight,
-      rtl = _ref.rtl,
-      svgContainerHeight = _ref.svgContainerHeight,
-      svgContainerWidth = _ref.svgContainerWidth,
-      scrollX = _ref.scrollX,
-      scrollY = _ref.scrollY,
-      arrowIndent = _ref.arrowIndent,
-      fontSize = _ref.fontSize,
-      fontFamily = _ref.fontFamily,
-      headerHeight = _ref.headerHeight,
-      taskListWidth = _ref.taskListWidth,
-      TooltipContent = _ref.TooltipContent;
-  var tooltipRef = useRef(null);
-
-  var _useState = useState(0),
-      relatedY = _useState[0],
-      setRelatedY = _useState[1];
-
-  var _useState2 = useState(0),
-      relatedX = _useState2[0],
-      setRelatedX = _useState2[1];
-
-  useEffect(function () {
-    if (tooltipRef.current) {
-      var tooltipWidth = tooltipRef.current.offsetWidth * 1.1;
-      var newRelatedY = task.index * rowHeight - scrollY + headerHeight - 200;
-      var newRelatedX;
-
-      if (rtl) {
-        newRelatedX = task.x1 - arrowIndent * 1.5 - tooltipWidth - scrollX;
-
-        if (newRelatedX < 0) {
-          newRelatedX = task.x2 + arrowIndent * 1.5 - scrollX;
-        }
-
-        var tooltipLeftmostPoint = tooltipWidth + newRelatedX;
-
-        if (tooltipLeftmostPoint > svgContainerWidth) {
-          newRelatedX = svgContainerWidth - tooltipWidth;
-          newRelatedY += rowHeight;
-        }
-      } else {
-        newRelatedX = task.x2 + arrowIndent * 1.5 + taskListWidth - scrollX;
-
-        var _tooltipLeftmostPoint = tooltipWidth + newRelatedX;
-
-        var fullChartWidth = taskListWidth + svgContainerWidth;
-
-        if (_tooltipLeftmostPoint > fullChartWidth) {
-          newRelatedX = task.x1 + taskListWidth - arrowIndent * 1.5 - scrollX - tooltipWidth;
-        }
-
-        if (newRelatedX < taskListWidth) {
-          newRelatedX = svgContainerWidth + taskListWidth - tooltipWidth;
-          newRelatedY += rowHeight;
-        }
-      }
-
-      setRelatedY(newRelatedY);
-      setRelatedX(newRelatedX);
-    }
-  }, [tooltipRef, task, arrowIndent, scrollX, scrollY, headerHeight, taskListWidth, rowHeight, svgContainerHeight, svgContainerWidth, rtl]);
-  return React.createElement("div", {
-    ref: tooltipRef,
-    className: relatedX ? styles$2.tooltipDetailsContainer : styles$2.tooltipDetailsContainerHidden,
-    style: {
-      left: relatedX,
-      top: relatedY
-    }
-  }, React.createElement(TooltipContent, {
-    task: task,
-    fontSize: fontSize,
-    fontFamily: fontFamily
-  }));
-};
-var StandardTooltipContent = function StandardTooltipContent(_ref2) {
-  var task = _ref2.task,
-      fontSize = _ref2.fontSize,
-      fontFamily = _ref2.fontFamily;
-
-  var _useProvideChipColors = useProvideChipColors(),
-      resolveChipColor = _useProvideChipColors.resolveChipColor,
-      resolveChipLabelColor = _useProvideChipColors.resolveChipLabelColor;
-
-  var style = {
-    fontSize: fontSize,
-    fontFamily: fontFamily
-  };
-  return React.createElement("div", {
-    className: styles$2.tooltipDefaultContainer,
-    style: style
-  }, React.createElement("b", {
-    style: {
-      fontSize: fontSize + 6,
-      textAlign: "center"
-    }
-  }, task.type === "project" ? React.createElement("div", {
-    style: {
-      margin: "auto"
-    }
-  }, React.createElement("div", {
-    style: {
-      background: resolveChipColor(task.color, "Title chip"),
-      color: resolveChipLabelColor(task.color, "Title chip"),
-      padding: "0.5rem 1rem",
-      borderRadius: "50px",
-      fontWeight: "600",
-      fontSize: "12px",
-      maxHeight: "30px",
-      lineHeight: 1,
-      maxWidth: "235px",
-      whiteSpace: "nowrap",
-      overflow: "hidden",
-      textOverflow: "ellipsis"
-    }
-  }, task.name)) : React.createElement("div", {
-    style: {
-      margin: "auto"
-    }
-  }, task.name)), React.createElement("pre", {
-    className: styles$2.tooltipDefaultContainerParagraph
-  }, task.start.getDate() + "." + (task.start.getMonth() + 1) + "." + task.start.getFullYear() + " - " + task.end.getDate() + "." + (task.end.getMonth() + 1) + "." + task.end.getFullYear()), task.end.getTime() - task.start.getTime() !== 0 && React.createElement("p", {
-    className: styles$2.tooltipDefaultContainerParagraph
-  }, "Duration: " + ~~((task.end.getTime() - task.start.getTime()) / (1000 * 60 * 60 * 24)) + " day(s)"), React.createElement("p", {
-    className: styles$2.tooltipDefaultContainerParagraph
-  }, !!task.progress && "Progress: " + task.progress + " %"));
-};
-
-var styles$3 = {"scroll":"_1eT-t"};
+var styles$2 = {"scroll":"_1eT-t"};
 
 var VerticalScroll = function VerticalScroll(_ref) {
   var scroll = _ref.scroll,
@@ -629,7 +514,7 @@ var VerticalScroll = function VerticalScroll(_ref) {
       marginTop: headerHeight,
       marginLeft: rtl ? "" : "-1rem"
     },
-    className: styles$3.scroll,
+    className: styles$2.scroll,
     onScroll: onScroll,
     ref: scrollRef
   }, React.createElement("div", {
@@ -692,7 +577,7 @@ var TaskList = function TaskList(_ref) {
   }, React.createElement(TaskListTable, Object.assign({}, tableProps))));
 };
 
-var styles$4 = {"gridRow":"_2dZTy","gridRowLine":"_3rUKi","gridTick":"_RuwuK"};
+var styles$3 = {"gridRow":"_2dZTy","gridRowLine":"_3rUKi","gridTick":"_RuwuK"};
 
 var GridBody = function GridBody(_ref) {
   var tasks = _ref.tasks,
@@ -710,7 +595,7 @@ var GridBody = function GridBody(_ref) {
     y1: 0,
     x2: svgWidth,
     y2: 0,
-    className: styles$4.gridRowLine
+    className: styles$3.gridRowLine
   })];
 
   for (var _iterator = _createForOfIteratorHelperLoose(tasks), _step; !(_step = _iterator()).done;) {
@@ -721,7 +606,7 @@ var GridBody = function GridBody(_ref) {
       y: y,
       width: svgWidth,
       height: rowHeight,
-      className: styles$4.gridRow
+      className: styles$3.gridRow
     }));
     rowLines.push(React.createElement("line", {
       key: "RowLine" + task.id,
@@ -729,7 +614,7 @@ var GridBody = function GridBody(_ref) {
       y1: y + rowHeight,
       x2: svgWidth,
       y2: y + rowHeight,
-      className: styles$4.gridRowLine
+      className: styles$3.gridRowLine
     }));
     y += rowHeight;
   }
@@ -747,7 +632,7 @@ var GridBody = function GridBody(_ref) {
       y1: 0,
       x2: tickX,
       y2: y,
-      className: styles$4.gridTick
+      className: styles$3.gridTick
     }));
 
     if (i + 1 !== dates.length && date.getTime() < now.getTime() && dates[i + 1].getTime() >= now.getTime() || i !== 0 && i + 1 === dates.length && date.getTime() < now.getTime() && addToDate(date, date.getTime() - dates[i - 1].getTime(), "millisecond").getTime() >= now.getTime()) {
@@ -792,7 +677,7 @@ var Grid = function Grid(props) {
   }, React.createElement(GridBody, Object.assign({}, props)));
 };
 
-var styles$5 = {"calendarBottomText":"_9w8d5","calendarTopTick":"_1rLuZ","calendarTopText":"_2q1Kt","calendarHeader":"_35nLX"};
+var styles$4 = {"calendarBottomText":"_9w8d5","calendarTopTick":"_1rLuZ","calendarTopText":"_2q1Kt","calendarHeader":"_35nLX"};
 
 var TopPartOfCalendar = function TopPartOfCalendar(_ref) {
   var value = _ref.value,
@@ -808,13 +693,13 @@ var TopPartOfCalendar = function TopPartOfCalendar(_ref) {
     y1: y1Line,
     x2: x1Line,
     y2: y2Line,
-    className: styles$5.calendarTopTick,
+    className: styles$4.calendarTopTick,
     key: value + "line"
   }), React.createElement("text", {
     key: value + "text",
     y: yText,
     x: xText,
-    className: styles$5.calendarTopText
+    className: styles$4.calendarTopText
   }, value));
 };
 
@@ -840,7 +725,7 @@ var Calendar = function Calendar(_ref) {
         key: date.getFullYear(),
         y: headerHeight * 0.8,
         x: columnWidth * i + columnWidth * 0.5,
-        className: styles$5.calendarBottomText
+        className: styles$4.calendarBottomText
       }, bottomValue));
 
       if (i === 0 || date.getFullYear() !== dateSetup.dates[i - 1].getFullYear()) {
@@ -880,7 +765,7 @@ var Calendar = function Calendar(_ref) {
         key: bottomValue + date.getFullYear(),
         y: headerHeight * 0.8,
         x: columnWidth * i + columnWidth * 0.5,
-        className: styles$5.calendarBottomText
+        className: styles$4.calendarBottomText
       }, bottomValue));
 
       if (i === 0 || date.getFullYear() !== dateSetup.dates[i - 1].getFullYear()) {
@@ -928,7 +813,7 @@ var Calendar = function Calendar(_ref) {
         key: date.getTime(),
         y: headerHeight * 0.8,
         x: columnWidth * (i + +rtl),
-        className: styles$5.calendarBottomText
+        className: styles$4.calendarBottomText
       }, bottomValue));
 
       if (topValue) {
@@ -969,7 +854,7 @@ var Calendar = function Calendar(_ref) {
         key: date.getTime(),
         y: headerHeight * 0.8,
         x: columnWidth * i + columnWidth * 0.5,
-        className: styles$5.calendarBottomText
+        className: styles$4.calendarBottomText
       }, bottomValue.split("/").join(".")));
 
       if (i + 1 !== dates.length && date.getMonth() !== dates[i + 1].getMonth()) {
@@ -1005,7 +890,7 @@ var Calendar = function Calendar(_ref) {
         key: date.getTime(),
         y: headerHeight * 0.8,
         x: columnWidth * (i + +rtl),
-        className: styles$5.calendarBottomText,
+        className: styles$4.calendarBottomText,
         fontFamily: fontFamily
       }, bottomValue));
 
@@ -1041,7 +926,7 @@ var Calendar = function Calendar(_ref) {
         key: date.getTime(),
         y: headerHeight * 0.8,
         x: columnWidth * (i + +rtl),
-        className: styles$5.calendarBottomText,
+        className: styles$4.calendarBottomText,
         fontFamily: fontFamily
       }, bottomValue));
 
@@ -1120,7 +1005,7 @@ var Calendar = function Calendar(_ref) {
     y: 0,
     width: columnWidth * dateSetup.dates.length,
     height: headerHeight,
-    className: styles$5.calendarHeader
+    className: styles$4.calendarHeader
   }), bottomValues, " ", topValues);
 };
 
@@ -1627,7 +1512,7 @@ var sortTasks = function sortTasks(taskA, taskB) {
   }
 };
 
-var styles$6 = {"barWrapper":"_KxSXS","barHandle":"_3w_5u","barBackground":"_31ERP"};
+var styles$5 = {"barWrapper":"_KxSXS","barHandle":"_3w_5u","barBackground":"_31ERP"};
 
 var BarDisplay = function BarDisplay(_ref) {
   var x = _ref.x,
@@ -1659,7 +1544,7 @@ var BarDisplay = function BarDisplay(_ref) {
     ry: barCornerRadius,
     rx: barCornerRadius,
     fill: getBarColor(),
-    className: styles$6.barBackground
+    className: styles$5.barBackground
   }), React.createElement("rect", {
     x: progressX,
     width: progressWidth,
@@ -1683,7 +1568,7 @@ var BarDateHandle = function BarDateHandle(_ref) {
     y: y,
     width: width,
     height: height,
-    className: styles$6.barHandle,
+    className: styles$5.barHandle,
     ry: barCornerRadius,
     rx: barCornerRadius,
     onMouseDown: onMouseDown
@@ -1694,19 +1579,40 @@ var BarProgressHandle = function BarProgressHandle(_ref) {
   var progressPoint = _ref.progressPoint,
       onMouseDown = _ref.onMouseDown;
   return React.createElement("polygon", {
-    className: styles$6.barHandle,
+    className: styles$5.barHandle,
     points: progressPoint,
     onMouseDown: onMouseDown
   });
 };
 
-var Bar = function Bar(_ref) {
-  var task = _ref.task,
-      isProgressChangeable = _ref.isProgressChangeable,
-      isDateChangeable = _ref.isDateChangeable,
-      rtl = _ref.rtl,
-      onEventStart = _ref.onEventStart,
-      isSelected = _ref.isSelected;
+var _excluded = ["className"];
+var HtmlTooltip = styled(function (_ref) {
+  var className = _ref.className,
+      props = _objectWithoutPropertiesLoose(_ref, _excluded);
+
+  return React.createElement(Tooltip, Object.assign({}, props, {
+    classes: {
+      popper: className
+    }
+  }));
+})(function () {
+  var _ref2;
+
+  return _ref2 = {}, _ref2["& ." + tooltipClasses.tooltip] = {
+    color: "#666",
+    background: "#fff",
+    padding: "1rem",
+    borderRadius: "1rem",
+    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"
+  }, _ref2;
+});
+var Bar = function Bar(_ref3) {
+  var task = _ref3.task,
+      isProgressChangeable = _ref3.isProgressChangeable,
+      isDateChangeable = _ref3.isDateChangeable,
+      rtl = _ref3.rtl,
+      onEventStart = _ref3.onEventStart,
+      isSelected = _ref3.isSelected;
 
   var _useProvideChipColors = useProvideChipColors(),
       resolveChipColor = _useProvideChipColors.resolveChipColor,
@@ -1720,8 +1626,26 @@ var Bar = function Bar(_ref) {
     backgroundSelectedColor: resolveChipColor(task.color, "test") || "#ededed"
   });
 
-  return React.createElement("g", {
-    className: styles$6.barWrapper,
+  return React.createElement(HtmlTooltip, {
+    title: React.createElement(React.Fragment, null, React.createElement(Typography, {
+      style: {
+        textAlign: "center",
+        color: "black",
+        fontSize: "14px"
+      }
+    }, React.createElement("div", {
+      style: {
+        margin: "auto"
+      }
+    }, task.name)), React.createElement("pre", {
+      className: styles$5.tooltipDefaultContainerParagraph
+    }, task.start.getDate() + "." + (task.start.getMonth() + 1) + "." + task.start.getFullYear() + " - " + task.end.getDate() + "." + (task.end.getMonth() + 1) + "." + task.end.getFullYear()), task.end.getTime() - task.start.getTime() !== 0 && React.createElement("p", {
+      className: styles$5.tooltipDefaultContainerParagraph
+    }, "Duration: " + ~~((task.end.getTime() - task.start.getTime()) / (1000 * 60 * 60 * 24)) + " day(s)"), React.createElement("p", {
+      className: styles$5.tooltipDefaultContainerParagraph
+    }, !!task.progress && "Progress: " + task.progress + " %"))
+  }, React.createElement("g", {
+    className: styles$5.barWrapper,
     tabIndex: 0
   }, React.createElement(BarDisplay, {
     x: task.x1,
@@ -1761,7 +1685,7 @@ var Bar = function Bar(_ref) {
     onMouseDown: function onMouseDown(e) {
       onEventStart("progress", task, e);
     }
-  })));
+  }))));
 };
 
 var BarSmall = function BarSmall(_ref) {
@@ -1772,7 +1696,7 @@ var BarSmall = function BarSmall(_ref) {
       isSelected = _ref.isSelected;
   var progressPoint = getProgressPoint(task.progressWidth + task.x1, task.y, task.height);
   return React.createElement("g", {
-    className: styles$6.barWrapper,
+    className: styles$5.barWrapper,
     tabIndex: 0
   }, React.createElement(BarDisplay, {
     x: task.x1,
@@ -1797,7 +1721,7 @@ var BarSmall = function BarSmall(_ref) {
   })));
 };
 
-var styles$7 = {"milestoneWrapper":"_RRr13","milestoneBackground":"_2P2B1"};
+var styles$6 = {"milestoneWrapper":"_RRr13","milestoneBackground":"_2P2B1"};
 
 var Milestone = function Milestone(_ref) {
   var task = _ref.task,
@@ -1817,7 +1741,7 @@ var Milestone = function Milestone(_ref) {
 
   return React.createElement("g", {
     tabIndex: 0,
-    className: styles$7.milestoneWrapper
+    className: styles$6.milestoneWrapper
   }, React.createElement("rect", {
     fill: getBarColor(),
     x: task.x1,
@@ -1827,14 +1751,14 @@ var Milestone = function Milestone(_ref) {
     rx: task.barCornerRadius,
     ry: task.barCornerRadius,
     transform: transform,
-    className: styles$7.milestoneBackground,
+    className: styles$6.milestoneBackground,
     onMouseDown: function onMouseDown(e) {
       isDateChangeable && onEventStart("move", task, e);
     }
   }));
 };
 
-var styles$8 = {"projectWrapper":"_1KJ6x","projectBackground":"_2RbVy","projectTop":"_2pZMF"};
+var styles$7 = {"projectWrapper":"_1KJ6x","projectBackground":"_2RbVy","projectTop":"_2pZMF"};
 
 var Project = function Project(_ref) {
   var task = _ref.task;
@@ -1844,9 +1768,36 @@ var Project = function Project(_ref) {
       resolveChipLabelColor = _useProvideChipColors.resolveChipLabelColor;
 
   var projectWith = task.x2 - task.x1;
-  return React.createElement("g", {
+  return React.createElement(HtmlTooltip, {
+    title: React.createElement(React.Fragment, null, React.createElement("div", {
+      style: {
+        margin: "auto"
+      }
+    }, React.createElement("div", {
+      style: {
+        background: resolveChipColor(task.color, "Title chip"),
+        color: resolveChipLabelColor(task.color, "Title chip"),
+        padding: "0.5rem 1rem",
+        borderRadius: "50px",
+        fontWeight: "600",
+        fontSize: "12px",
+        maxHeight: "30px",
+        lineHeight: 1,
+        maxWidth: "235px",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis"
+      }
+    }, task.name)), React.createElement("pre", {
+      className: styles$7.tooltipDefaultContainerParagraph
+    }, task.start.getDate() + "." + (task.start.getMonth() + 1) + "." + task.start.getFullYear() + " - " + task.end.getDate() + "." + (task.end.getMonth() + 1) + "." + task.end.getFullYear()), task.end.getTime() - task.start.getTime() !== 0 && React.createElement("p", {
+      className: styles$7.tooltipDefaultContainerParagraph
+    }, "Duration: " + ~~((task.end.getTime() - task.start.getTime()) / (1000 * 60 * 60 * 24)) + " day(s)"), React.createElement("p", {
+      className: styles$7.tooltipDefaultContainerParagraph
+    }, !!task.progress && "Progress: " + task.progress + " %"))
+  }, React.createElement("g", {
     tabIndex: 0,
-    className: styles$8.projectWrapper
+    className: styles$7.projectWrapper
   }, React.createElement("rect", {
     fill: resolveChipColor(task.color, "test"),
     x: task.x1,
@@ -1855,7 +1806,7 @@ var Project = function Project(_ref) {
     height: 5,
     rx: task.barCornerRadius,
     ry: task.barCornerRadius,
-    className: styles$8.projectBackground
+    className: styles$7.projectBackground
   }), React.createElement("rect", {
     x: task.progressX,
     width: task.progressWidth,
@@ -1864,7 +1815,7 @@ var Project = function Project(_ref) {
     ry: task.barCornerRadius,
     rx: task.barCornerRadius,
     fill: resolveChipLabelColor(task.color, "test")
-  }));
+  })));
 };
 
 var style = {"barLabel":"_3zRJQ","barLabelOutside":"_3KcaM"};
@@ -2229,7 +2180,7 @@ var TaskGanttContent = function TaskGanttContent(_ref) {
   })));
 };
 
-var styles$9 = {"ganttVerticalContainer":"_CZjuD","ganttVerticalContainerChanged":"_15X0H","horizontalContainer":"_2B2zv","horizontalContainerChanged":"_1zqJ8","wrapper":"_3eULf"};
+var styles$8 = {"ganttVerticalContainer":"_CZjuD","ganttVerticalContainerChanged":"_15X0H","horizontalContainer":"_2B2zv","horizontalContainerChanged":"_1zqJ8","wrapper":"_3eULf"};
 
 var TaskGantt = function TaskGantt(_ref) {
   var gridProps = _ref.gridProps,
@@ -2257,7 +2208,7 @@ var TaskGantt = function TaskGantt(_ref) {
     }
   }, [scrollX]);
   return React.createElement("div", {
-    className: styles$9.ganttVerticalContainerChanged,
+    className: styles$8.ganttVerticalContainerChanged,
     ref: verticalGanttContainerRef,
     dir: "ltr"
   }, React.createElement("svg", {
@@ -2267,7 +2218,7 @@ var TaskGantt = function TaskGantt(_ref) {
     fontFamily: barProps.fontFamily
   }, React.createElement(Calendar, Object.assign({}, calendarProps))), React.createElement("div", {
     ref: horizontalContainerRef,
-    className: styles$9.horizontalContainer,
+    className: styles$8.horizontalContainer,
     style: ganttHeight ? {
       height: ganttHeight,
       width: gridProps.svgWidth
@@ -2281,36 +2232,6 @@ var TaskGantt = function TaskGantt(_ref) {
     fontFamily: barProps.fontFamily,
     ref: ganttSVGRef
   }, React.createElement(Grid, Object.assign({}, gridProps)), React.createElement(TaskGanttContent, Object.assign({}, newBarProps)))));
-};
-
-var styles$a = {"scrollWrapper":"_2k9Ys","scroll":"_19jgW"};
-
-var HorizontalScroll = function HorizontalScroll(_ref) {
-  var scroll = _ref.scroll,
-      svgWidth = _ref.svgWidth,
-      taskListWidth = _ref.taskListWidth,
-      rtl = _ref.rtl,
-      onScroll = _ref.onScroll;
-  var scrollRef = useRef(null);
-  useEffect(function () {
-    if (scrollRef.current) {
-      scrollRef.current.scrollLeft = scroll;
-    }
-  }, [scroll]);
-  return React.createElement("div", {
-    dir: "ltr",
-    style: {
-      margin: rtl ? "0px " + taskListWidth + "px 0px 0px" : "0px 0px 0px " + taskListWidth + "px"
-    },
-    className: styles$a.scrollWrapper,
-    onScroll: onScroll,
-    ref: scrollRef
-  }, React.createElement("div", {
-    style: {
-      width: svgWidth
-    },
-    className: styles$a.scroll
-  }));
 };
 
 var Gantt = function Gantt(_ref) {
@@ -2372,8 +2293,6 @@ var Gantt = function Gantt(_ref) {
       _ref$todayColor = _ref.todayColor,
       todayColor = _ref$todayColor === void 0 ? "rgba(252, 248, 227, 0.5)" : _ref$todayColor,
       viewDate = _ref.viewDate,
-      _ref$TooltipContent = _ref.TooltipContent,
-      TooltipContent = _ref$TooltipContent === void 0 ? StandardTooltipContent : _ref$TooltipContent,
       _ref$TaskListHeader = _ref.TaskListHeader,
       TaskListHeader = _ref$TaskListHeader === void 0 ? TaskListHeaderDefault : _ref$TaskListHeader,
       _ref$TaskListTable = _ref.TaskListTable,
@@ -2405,54 +2324,42 @@ var Gantt = function Gantt(_ref) {
       currentViewDate = _useState2[0],
       setCurrentViewDate = _useState2[1];
 
-  var _useState3 = useState(0),
-      taskListWidth = _useState3[0],
-      setTaskListWidth = _useState3[1];
+  var _useState3 = useState([]),
+      barTasks = _useState3[0],
+      setBarTasks = _useState3[1];
 
-  var _useState4 = useState(0),
-      svgContainerWidth = _useState4[0],
-      setSvgContainerWidth = _useState4[1];
-
-  var _useState5 = useState(ganttHeight),
-      svgContainerHeight = _useState5[0],
-      setSvgContainerHeight = _useState5[1];
-
-  var _useState6 = useState([]),
-      barTasks = _useState6[0],
-      setBarTasks = _useState6[1];
-
-  var _useState7 = useState({
+  var _useState4 = useState({
     action: ""
   }),
-      ganttEvent = _useState7[0],
-      setGanttEvent = _useState7[1];
+      ganttEvent = _useState4[0],
+      setGanttEvent = _useState4[1];
 
   var taskHeight = useMemo(function () {
     return rowHeight * barFill / 100;
   }, [rowHeight, barFill]);
 
-  var _useState8 = useState(),
-      selectedTask = _useState8[0],
-      setSelectedTask = _useState8[1];
+  var _useState5 = useState(),
+      selectedTask = _useState5[0],
+      setSelectedTask = _useState5[1];
 
-  var _useState9 = useState(null),
-      failedTask = _useState9[0],
-      setFailedTask = _useState9[1];
+  var _useState6 = useState(null),
+      failedTask = _useState6[0],
+      setFailedTask = _useState6[1];
 
   var svgWidth = dateSetup.dates.length * columnWidth;
   var ganttFullHeight = barTasks.length * rowHeight;
 
-  var _useState10 = useState(0),
-      scrollY = _useState10[0],
-      setScrollY = _useState10[1];
+  var _useState7 = useState(0),
+      scrollY = _useState7[0],
+      setScrollY = _useState7[1];
 
-  var _useState11 = useState(-1),
-      scrollX = _useState11[0],
-      setScrollX = _useState11[1];
+  var _useState8 = useState(-1),
+      scrollX = _useState8[0],
+      setScrollX = _useState8[1];
 
-  var _useState12 = useState(false),
-      ignoreScrollEvent = _useState12[0],
-      setIgnoreScrollEvent = _useState12[1];
+  var _useState9 = useState(false),
+      ignoreScrollEvent = _useState9[0],
+      setIgnoreScrollEvent = _useState9[1];
 
   useEffect(function () {
     var filteredTasks;
@@ -2535,27 +2442,6 @@ var Gantt = function Gantt(_ref) {
     }
   }, [failedTask, barTasks]);
   useEffect(function () {
-    if (!listCellWidth) {
-      setTaskListWidth(0);
-    }
-
-    if (taskListRef.current) {
-      setTaskListWidth(taskListRef.current.offsetWidth);
-    }
-  }, [taskListRef, listCellWidth]);
-  useEffect(function () {
-    if (wrapperRef.current) {
-      setSvgContainerWidth(wrapperRef.current.offsetWidth - taskListWidth);
-    }
-  }, [wrapperRef, taskListWidth]);
-  useEffect(function () {
-    if (ganttHeight) {
-      setSvgContainerHeight(ganttHeight + headerHeight);
-    } else {
-      setSvgContainerHeight(tasks.length * rowHeight + headerHeight);
-    }
-  }, [ganttHeight, tasks, headerHeight, rowHeight]);
-  useEffect(function () {
     var _wrapperRef$current;
 
     var handleWheel = function handleWheel(event) {
@@ -2602,15 +2488,6 @@ var Gantt = function Gantt(_ref) {
   var handleScrollY = function handleScrollY(event) {
     if (scrollY !== event.currentTarget.scrollTop && !ignoreScrollEvent) {
       setScrollY(event.currentTarget.scrollTop);
-      setIgnoreScrollEvent(true);
-    } else {
-      setIgnoreScrollEvent(false);
-    }
-  };
-
-  var handleScrollX = function handleScrollX(event) {
-    if (scrollX !== event.currentTarget.scrollLeft && !ignoreScrollEvent) {
-      setScrollX(event.currentTarget.scrollLeft);
       setIgnoreScrollEvent(true);
     } else {
       setIgnoreScrollEvent(false);
@@ -2750,7 +2627,7 @@ var Gantt = function Gantt(_ref) {
     headerHeight: headerHeight,
     scrollY: scrollY,
     ganttHeight: ganttHeight,
-    horizontalContainerClass: styles$9.horizontalContainer,
+    horizontalContainerClass: styles$8.horizontalContainer,
     selectedTask: selectedTask,
     taskListRef: taskListRef,
     setSelectedTask: handleSelectedTask,
@@ -2759,7 +2636,7 @@ var Gantt = function Gantt(_ref) {
     TaskListTable: TaskListTable
   };
   return React.createElement("div", null, React.createElement("div", {
-    className: styles$9.wrapper,
+    className: styles$8.wrapper,
     onKeyDown: handleKeyDown,
     tabIndex: 0,
     ref: wrapperRef
@@ -2770,21 +2647,6 @@ var Gantt = function Gantt(_ref) {
     ganttHeight: ganttHeight,
     scrollY: scrollY,
     scrollX: scrollX
-  }), ganttEvent.changedTask && React.createElement(Tooltip, {
-    arrowIndent: arrowIndent,
-    rowHeight: rowHeight,
-    svgContainerHeight: svgContainerHeight,
-    svgContainerWidth: svgContainerWidth,
-    fontFamily: fontFamily,
-    fontSize: fontSize,
-    scrollX: scrollX,
-    scrollY: scrollY,
-    task: ganttEvent.changedTask,
-    headerHeight: 300,
-    taskListWidth: taskListWidth,
-    TooltipContent: TooltipContent,
-    rtl: rtl,
-    svgWidth: svgWidth
   }), React.createElement(VerticalScroll, {
     ganttFullHeight: ganttFullHeight,
     ganttHeight: ganttHeight,
@@ -2792,13 +2654,7 @@ var Gantt = function Gantt(_ref) {
     scroll: scrollY,
     onScroll: handleScrollY,
     rtl: rtl
-  })), React.createElement(HorizontalScroll, {
-    svgWidth: svgWidth,
-    taskListWidth: taskListWidth,
-    scroll: scrollX,
-    rtl: rtl,
-    onScroll: handleScrollX
-  }));
+  })));
 };
 
 export { Gantt, ViewMode };
