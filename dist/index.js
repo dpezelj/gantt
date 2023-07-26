@@ -579,8 +579,8 @@ var StandardTooltipContent = function StandardTooltipContent(_ref2) {
     }
   }, React__default.createElement("div", {
     style: {
-      background: resolveChipColor("blue", "Title chip"),
-      color: resolveChipLabelColor("blue", "Title chip"),
+      background: resolveChipColor(task.color, "Title chip"),
+      color: resolveChipLabelColor(task.color, "Title chip"),
       padding: "0.5rem 1rem",
       borderRadius: "50px",
       fontWeight: "600"
