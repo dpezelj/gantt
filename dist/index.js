@@ -428,7 +428,7 @@ var TaskListTableDefault = function TaskListTableDefault(_ref) {
     }, React__default.createElement("div", {
       className: styles$1.taskListCell,
       style: {
-        minWidth: rowWidth,
+        minWidth: "270px",
         maxWidth: rowWidth
       },
       title: t.name
@@ -449,7 +449,13 @@ var TaskListTableDefault = function TaskListTableDefault(_ref) {
         color: resolveChipLabelColor(t.color, "Title chip"),
         padding: "0.5rem 1rem",
         borderRadius: "50px",
-        fontWeight: "600"
+        fontWeight: "600",
+        maxHeight: "30px",
+        lineHeight: 1,
+        maxWidth: "250px",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis"
       }
     }, t.name)) : React__default.createElement("div", {
       style: {
