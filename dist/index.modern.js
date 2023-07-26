@@ -449,16 +449,18 @@ var TaskListTableDefault = function TaskListTableDefault(_ref) {
         padding: "0.5rem 1rem",
         borderRadius: "50px",
         fontWeight: "600",
+        fontSize: "12px",
         maxHeight: "30px",
         lineHeight: 1,
-        maxWidth: "250px",
+        maxWidth: "235px",
         whiteSpace: "nowrap",
         overflow: "hidden",
         textOverflow: "ellipsis"
       }
     }, t.name)) : React.createElement("div", {
       style: {
-        margin: "auto"
+        margin: "auto",
+        fontSize: "12px"
       }
     }, t.name))), React.createElement("div", {
       className: styles$1.taskListCell,
@@ -466,7 +468,9 @@ var TaskListTableDefault = function TaskListTableDefault(_ref) {
         minWidth: rowWidth,
         maxWidth: rowWidth,
         width: "67%",
-        textAlign: "center"
+        textAlign: "center",
+        color: "#747474",
+        fontSize: "12px"
       }
     }, "\xA0", formatDate(toLocaleDateString(t.start, dateTimeOptions)).split("/").join(".") + " - " + formatDate(toLocaleDateString(t.end, dateTimeOptions)).split("/").join(".")));
   }));
@@ -582,7 +586,14 @@ var StandardTooltipContent = function StandardTooltipContent(_ref2) {
       color: resolveChipLabelColor(task.color, "Title chip"),
       padding: "0.5rem 1rem",
       borderRadius: "50px",
-      fontWeight: "600"
+      fontWeight: "600",
+      fontSize: "12px",
+      maxHeight: "30px",
+      lineHeight: 1,
+      maxWidth: "235px",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis"
     }
   }, task.name)) : React.createElement("div", {
     style: {
@@ -1714,9 +1725,9 @@ var Bar = function Bar(_ref) {
     tabIndex: 0
   }, React.createElement(BarDisplay, {
     x: task.x1,
-    y: task.y,
+    y: task.y + 2,
     width: task.x2 - task.x1,
-    height: task.height,
+    height: 15,
     progressX: task.progressX,
     progressWidth: 0,
     barCornerRadius: task.barCornerRadius,
@@ -1840,16 +1851,16 @@ var Project = function Project(_ref) {
     fill: resolveChipColor(task.color, "test"),
     x: task.x1,
     width: projectWith,
-    y: task.y,
-    height: 10,
+    y: task.y + 7,
+    height: 5,
     rx: task.barCornerRadius,
     ry: task.barCornerRadius,
     className: styles$8.projectBackground
   }), React.createElement("rect", {
     x: task.progressX,
     width: task.progressWidth,
-    y: task.y,
-    height: 10,
+    y: task.y + 7,
+    height: 5,
     ry: task.barCornerRadius,
     rx: task.barCornerRadius,
     fill: resolveChipLabelColor(task.color, "test")

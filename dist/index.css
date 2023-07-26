@@ -1,6 +1,6 @@
 ._3_ygE {
   display: table;
-  border-bottom: #e6e4e4 1px solid;
+  /* border-bottom: #e6e4e4 1px solid; */
   /*
   border-top: #e6e4e4 1px solid;
   border-left: #e6e4e4 1px solid; */
@@ -25,8 +25,8 @@
 
 ._3ZbQT {
   display: table;
-  border-bottom: #e6e4e4 1px solid;
-  border-left: #e6e4e4 1px solid;
+  /* border-bottom: #e6e4e4 1px solid;
+  border-left: #e6e4e4 1px solid; */
 }
 
 ._34SS0 {
@@ -35,7 +35,7 @@
 }
 
 ._34SS0:nth-of-type(even) {
-  background-color: #f5f5f5;
+  background-color: #fff;
 }
 
 ._3lLk3 {
@@ -50,7 +50,7 @@
 }
 
 ._2QjE6 {
-  color: rgb(86 86 86);
+  color: #ccc;
   font-size: 0.6rem;
   padding: 0.15rem 0.2rem 0rem 0.2rem;
   -webkit-user-select: none;
@@ -134,15 +134,15 @@
 }
 
 ._2dZTy:nth-child(even) {
-  fill: #f5f5f5;
+  fill: #fff;
 }
 
 ._3rUKi {
-  stroke: #ebeff2;
+  stroke: #fafafa;
 }
 
 ._RuwuK {
-  stroke: #e6e4e4;
+  stroke: #fafafa;
 }
 
 ._9w8d5 {
@@ -154,6 +154,8 @@
   -ms-user-select: none;
   user-select: none;
   pointer-events: none;
+  font-size: 12px;
+  color: #333;
 }
 
 ._1rLuZ {
