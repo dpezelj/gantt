@@ -305,6 +305,59 @@ var TaskListHeaderDefault = function TaskListHeaderDefault(_ref) {
 
 var styles$1 = {"taskListWrapper":"_3ZbQT","taskListTableRow":"_34SS0","taskListCell":"_3lLk3","taskListNameWrapper":"_nI1Xw","taskListExpander":"_2QjE6","taskListEmptyExpander":"_2TfEi"};
 
+var chipColors = {
+  blue: {
+    text: "#518EE0",
+    background: "#DAF0FB"
+  },
+  yellow: {
+    text: "#987901",
+    background: "#FEEBA3"
+  },
+  green: {
+    text: "#2D862D",
+    background: "#ADE3AC"
+  },
+  red: {
+    text: "#f06",
+    background: "#FEA3C8"
+  },
+  purple: {
+    text: "#306",
+    background: "#B770FE"
+  },
+  brown: {
+    text: "#930",
+    background: "#FE9A70"
+  },
+  rose: {
+    text: "#c3c",
+    background: "#EBADEB"
+  },
+  kaki: {
+    text: "#E78336",
+    background: "#FCEFD4"
+  },
+  orange: {
+    text: "#a13b08",
+    background: "#fb9b72"
+  }
+};
+var useProvideChipColors = function useProvideChipColors() {
+  var resolveChipColor = function resolveChipColor(badgeColor, badgeTitle) {
+    return badgeColor ? badgeTitle === "Setup" ? "#022D5F" : chipColors[badgeColor].background : undefined;
+  };
+
+  var resolveChipLabelColor = function resolveChipLabelColor(badgeColor, badgeTitle) {
+    return badgeColor ? badgeTitle === "Setup" ? "white" : chipColors[badgeColor].text : undefined;
+  };
+
+  return {
+    resolveChipColor: resolveChipColor,
+    resolveChipLabelColor: resolveChipLabelColor
+  };
+};
+
 var localeDateStringCache = {};
 
 var toLocaleDateStringFactory = function toLocaleDateStringFactory(locale) {
@@ -323,10 +376,9 @@ var toLocaleDateStringFactory = function toLocaleDateStringFactory(locale) {
 
 function formatDate(inputDate) {
   var dateObject = new Date(inputDate);
-  return dateObject.toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
+  return dateObject.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit"
   });
 }
 
@@ -344,6 +396,11 @@ var TaskListTableDefault = function TaskListTableDefault(_ref) {
       fontSize = _ref.fontSize,
       locale = _ref.locale,
       onExpanderClick = _ref.onExpanderClick;
+
+  var _useProvideChipColors = useProvideChipColors(),
+      resolveChipColor = _useProvideChipColors.resolveChipColor,
+      resolveChipLabelColor = _useProvideChipColors.resolveChipLabelColor;
+
   var toLocaleDateString = React.useMemo(function () {
     return toLocaleDateStringFactory(locale);
   }, [locale]);
@@ -382,7 +439,19 @@ var TaskListTableDefault = function TaskListTableDefault(_ref) {
       onClick: function onClick() {
         return onExpanderClick(t);
       }
-    }, expanderSymbol), React__default.createElement("div", {
+    }, expanderSymbol), t.type === "project" ? React__default.createElement("div", {
+      style: {
+        margin: "auto"
+      }
+    }, React__default.createElement("div", {
+      style: {
+        background: resolveChipColor(t.color, "Title chip"),
+        color: resolveChipLabelColor(t.color, "Title chip"),
+        padding: "0.5rem 1rem",
+        borderRadius: "50px",
+        fontWeight: "600"
+      }
+    }, t.name)) : React__default.createElement("div", {
       style: {
         margin: "auto"
       }
@@ -394,7 +463,7 @@ var TaskListTableDefault = function TaskListTableDefault(_ref) {
         width: "67%",
         textAlign: "center"
       }
-    }, "\xA0", formatDate(toLocaleDateString(t.start, dateTimeOptions)).split('/').join('.') + " - " + formatDate(toLocaleDateString(t.end, dateTimeOptions)).split('/').join('.')));
+    }, "\xA0", formatDate(toLocaleDateString(t.start, dateTimeOptions)).split("/").join(".") + " - " + formatDate(toLocaleDateString(t.end, dateTimeOptions)).split("/").join(".")));
   }));
 };
 
@@ -481,6 +550,11 @@ var StandardTooltipContent = function StandardTooltipContent(_ref2) {
   var task = _ref2.task,
       fontSize = _ref2.fontSize,
       fontFamily = _ref2.fontFamily;
+
+  var _useProvideChipColors = useProvideChipColors(),
+      resolveChipColor = _useProvideChipColors.resolveChipColor,
+      resolveChipLabelColor = _useProvideChipColors.resolveChipLabelColor;
+
   var style = {
     fontSize: fontSize,
     fontFamily: fontFamily
@@ -493,7 +567,23 @@ var StandardTooltipContent = function StandardTooltipContent(_ref2) {
       fontSize: fontSize + 6,
       textAlign: "center"
     }
-  }, "" + task.name), React__default.createElement("pre", {
+  }, task.type === "project" ? React__default.createElement("div", {
+    style: {
+      margin: "auto"
+    }
+  }, React__default.createElement("div", {
+    style: {
+      background: resolveChipColor("blue", "Title chip"),
+      color: resolveChipLabelColor("blue", "Title chip"),
+      padding: "0.5rem 1rem",
+      borderRadius: "50px",
+      fontWeight: "600"
+    }
+  }, task.name)) : React__default.createElement("div", {
+    style: {
+      margin: "auto"
+    }
+  }, task.name)), React__default.createElement("pre", {
     className: styles$2.tooltipDefaultContainerParagraph
   }, task.start.getDate() + "." + (task.start.getMonth() + 1) + "." + task.start.getFullYear() + " - " + task.end.getDate() + "." + (task.end.getMonth() + 1) + "." + task.end.getFullYear()), task.end.getTime() - task.start.getTime() !== 0 && React__default.createElement("p", {
     className: styles$2.tooltipDefaultContainerParagraph
@@ -856,8 +946,8 @@ var Calendar = function Calendar(_ref) {
     for (var i = 0; i < dates.length; i++) {
       var date = dates[i];
       var bottomValue = date.toLocaleDateString(locale, {
-        day: '2-digit',
-        month: '2-digit'
+        day: "2-digit",
+        month: "2-digit"
       });
       bottomValues.push(React__default.createElement("text", {
         key: date.getTime(),
@@ -867,7 +957,7 @@ var Calendar = function Calendar(_ref) {
       }, bottomValue.split("/").join(".")));
 
       if (i + 1 !== dates.length && date.getMonth() !== dates[i + 1].getMonth()) {
-        var topValue = getLocaleMonth(date, locale);
+        var topValue = getLocaleMonth(date, locale) + ", " + date.getFullYear();
         topValues.push(React__default.createElement(TopPartOfCalendar, {
           key: topValue + date.getFullYear(),
           value: topValue,
@@ -1601,8 +1691,19 @@ var Bar = function Bar(_ref) {
       rtl = _ref.rtl,
       onEventStart = _ref.onEventStart,
       isSelected = _ref.isSelected;
+
+  var _useProvideChipColors = useProvideChipColors(),
+      resolveChipColor = _useProvideChipColors.resolveChipColor,
+      resolveChipLabelColor = _useProvideChipColors.resolveChipLabelColor;
+
   var progressPoint = getProgressPoint(+!rtl * task.progressWidth + task.progressX, task.y, task.height);
   var handleHeight = task.height - 2;
+
+  var taskStyle = _extends({}, task.styles, {
+    backgroundColor: resolveChipLabelColor(task.color, "test") || "#ededed",
+    backgroundSelectedColor: resolveChipColor(task.color, "test") || "#ededed"
+  });
+
   return React__default.createElement("g", {
     className: styles$6.barWrapper,
     tabIndex: 0
@@ -1614,7 +1715,7 @@ var Bar = function Bar(_ref) {
     progressX: task.progressX,
     progressWidth: 0,
     barCornerRadius: task.barCornerRadius,
-    styles: task.styles,
+    styles: taskStyle,
     isSelected: isSelected,
     onMouseDown: function onMouseDown(e) {
       isDateChangeable && onEventStart("move", task, e);
@@ -1687,10 +1788,15 @@ var Milestone = function Milestone(_ref) {
       isDateChangeable = _ref.isDateChangeable,
       onEventStart = _ref.onEventStart,
       isSelected = _ref.isSelected;
+
+  var _useProvideChipColors = useProvideChipColors(),
+      resolveChipColor = _useProvideChipColors.resolveChipColor,
+      resolveChipLabelColor = _useProvideChipColors.resolveChipLabelColor;
+
   var transform = "rotate(45 " + (task.x1 + task.height * 0.356) + " \n    " + (task.y + task.height * 0.85) + ")";
 
   var getBarColor = function getBarColor() {
-    return isSelected ? task.styles.backgroundSelectedColor : task.styles.backgroundColor;
+    return isSelected ? resolveChipColor(task.color, "test") || "#ededed" : resolveChipLabelColor(task.color, "test") || "#ededed";
   };
 
   return React__default.createElement("g", {
@@ -1715,19 +1821,22 @@ var Milestone = function Milestone(_ref) {
 var styles$8 = {"projectWrapper":"_1KJ6x","projectBackground":"_2RbVy","projectTop":"_2pZMF"};
 
 var Project = function Project(_ref) {
-  var task = _ref.task,
-      isSelected = _ref.isSelected;
-  var barColor = isSelected ? task.styles.backgroundSelectedColor : task.styles.backgroundColor;
+  var task = _ref.task;
+
+  var _useProvideChipColors = useProvideChipColors(),
+      resolveChipColor = _useProvideChipColors.resolveChipColor,
+      resolveChipLabelColor = _useProvideChipColors.resolveChipLabelColor;
+
   var projectWith = task.x2 - task.x1;
   return React__default.createElement("g", {
     tabIndex: 0,
     className: styles$8.projectWrapper
   }, React__default.createElement("rect", {
-    fill: "transparent",
+    fill: resolveChipColor(task.color, "test"),
     x: task.x1,
     width: projectWith,
     y: task.y,
-    height: task.height,
+    height: 10,
     rx: task.barCornerRadius,
     ry: task.barCornerRadius,
     className: styles$8.projectBackground
@@ -1735,19 +1844,10 @@ var Project = function Project(_ref) {
     x: task.progressX,
     width: task.progressWidth,
     y: task.y,
-    height: task.height,
+    height: 10,
     ry: task.barCornerRadius,
     rx: task.barCornerRadius,
-    fill: "transparent"
-  }), React__default.createElement("rect", {
-    fill: barColor,
-    x: task.x1,
-    width: projectWith,
-    y: task.y,
-    height: task.height / 2,
-    rx: task.barCornerRadius,
-    ry: task.barCornerRadius,
-    className: styles$8.projectTop
+    fill: resolveChipLabelColor(task.color, "test")
   }));
 };
 
