@@ -148,6 +148,12 @@
   stroke-width: 1.4; */
 }
 
+._3QRTF {
+  stroke: grey;
+  stroke-width: 2;
+  stroke-dasharray: 4;
+}
+
 ._KxSXS {
   cursor: pointer;
   outline: none;
@@ -171,6 +177,18 @@
       -ms-user-select: none;
           user-select: none;
   stroke-width: 0;
+}
+
+._2yAoi:hover ._E5hrM,
+._E5hrM._30bh6 {
+  opacity: 1;
+}
+
+._E5hrM {
+  fill: #ddd;
+  stroke: #333;
+  cursor: pointer;
+  opacity: 0;
 }
 
 ._RRr13 {

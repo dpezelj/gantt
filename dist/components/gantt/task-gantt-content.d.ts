@@ -1,11 +1,12 @@
 import React from "react";
 import { EventOption } from "../../types/public-types";
 import { BarTask } from "../../types/bar-task";
-import { GanttEvent } from "../../types/gantt-task-actions";
+import { GanttEvent, GanttRelationEvent } from "../../types/gantt-task-actions";
 export declare type TaskGanttContentProps = {
     tasks: BarTask[];
     dates: Date[];
     ganttEvent: GanttEvent;
+    ganttRelationEvent: GanttRelationEvent | null;
     selectedTask: BarTask | undefined;
     rowHeight: number;
     columnWidth: number;
@@ -13,12 +14,16 @@ export declare type TaskGanttContentProps = {
     svg?: React.RefObject<SVGSVGElement>;
     svgWidth: number;
     taskHeight: number;
+    taskHalfHeight: number;
+    relationCircleOffset: number;
+    relationCircleRadius: number;
     arrowColor: string;
     arrowIndent: number;
     fontSize: string;
     fontFamily: string;
     rtl: boolean;
     setGanttEvent: (value: GanttEvent) => void;
+    setGanttRelationEvent: React.Dispatch<React.SetStateAction<GanttRelationEvent | null>>;
     setFailedTask: (value: BarTask | null) => void;
     setSelectedTask: (taskId: string) => void;
 } & EventOption;

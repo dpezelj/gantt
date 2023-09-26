@@ -6,3 +6,12 @@ export declare type GanttEvent = {
     originalSelectedTask?: BarTask;
     action: GanttContentMoveAction;
 };
+export declare type RelationMoveTarget = "startOfTask" | "endOfTask";
+export declare type GanttRelationEvent = {
+    target: RelationMoveTarget;
+    task: BarTask;
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+};

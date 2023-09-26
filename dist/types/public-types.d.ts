@@ -1,4 +1,5 @@
 /// <reference types="react" />
+import { RelationMoveTarget } from "./gantt-task-actions";
 export declare enum ViewMode {
     Hour = "Hour",
     QuarterDay = "Quarter Day",
@@ -9,6 +10,7 @@ export declare enum ViewMode {
     Month = "Month",
     Year = "Year"
 }
+export declare type OnRelationChange = (from: [Task, RelationMoveTarget], to: [Task, RelationMoveTarget]) => void;
 export declare type TaskType = "task" | "milestone" | "project";
 export interface Task {
     id: string;
@@ -55,6 +57,10 @@ export interface EventOption {
      */
     onDateChange?: (task: Task, children: Task[]) => void | boolean | Promise<void> | Promise<boolean>;
     /**
+     * Invokes new relation between tasks
+     */
+    onRelationChange?: OnRelationChange;
+    /**
      * Invokes on progress change. Chart undoes operation if method return false or error.
      */
     onProgressChange?: (task: Task, children: Task[]) => void | boolean | Promise<void> | Promise<boolean>;
@@ -82,6 +88,8 @@ export interface StylingOption {
     columnWidth?: number;
     listCellWidth?: string;
     rowHeight?: number;
+    relationCircleOffset?: number;
+    relationCircleRadius?: number;
     ganttHeight?: number;
     barCornerRadius?: number;
     handleWidth?: number;

@@ -4,8 +4,9 @@ var React = require('react');
 var React__default = _interopDefault(React);
 var ChevronRightIcon = _interopDefault(require('@mui/icons-material/ChevronRight'));
 var ExpandMoreIcon = _interopDefault(require('@mui/icons-material/ExpandMore'));
+var cx = _interopDefault(require('classnames'));
 var material = require('@mui/material');
-var styles$9 = require('@mui/material/styles');
+var styles$a = require('@mui/material/styles');
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -1084,6 +1085,43 @@ var drownPathAndTriangleRTL = function drownPathAndTriangleRTL(taskFrom, taskTo,
   return [path, trianglePoints];
 };
 
+var styles$5 = {"relationLine":"_3QRTF"};
+
+var RelationLine = function RelationLine(_ref) {
+  var x1 = _ref.x1,
+      x2 = _ref.x2,
+      y1 = _ref.y1,
+      y2 = _ref.y2;
+  return React__default.createElement("line", {
+    x1: x1,
+    x2: x2,
+    y1: y1,
+    y2: y2,
+    className: styles$5.relationLine
+  });
+};
+
+var getRelationCircleByCoordinates = function getRelationCircleByCoordinates(svgP, tasks, taskHalfHeight, relationCircleOffset, relationCircleRadius, rtl) {
+  var x = svgP.x,
+      y = svgP.y;
+
+  for (var i = 0, l = tasks.length; i < l; ++i) {
+    var task = tasks[i];
+
+    if (y >= task.y + taskHalfHeight - relationCircleRadius && y <= task.y + taskHalfHeight + relationCircleRadius) {
+      if (x >= task.x1 - relationCircleOffset - relationCircleRadius && y <= task.x1 - relationCircleOffset + relationCircleRadius) {
+        return [task, rtl ? "endOfTask" : "startOfTask"];
+      }
+
+      if (x >= task.x2 + relationCircleOffset - relationCircleRadius && y <= task.x2 + relationCircleOffset + relationCircleRadius) {
+        return [task, rtl ? "startOfTask" : "endOfTask"];
+      }
+    }
+  }
+
+  return null;
+};
+
 var convertToBarTasks = function convertToBarTasks(tasks, dates, columnWidth, rowHeight, taskHeight, barCornerRadius, handleWidth, rtl, barProgressColor, barProgressSelectedColor, barBackgroundColor, barBackgroundSelectedColor, projectProgressColor, projectProgressSelectedColor, projectBackgroundColor, projectBackgroundSelectedColor, milestoneBackgroundColor, milestoneBackgroundSelectedColor) {
   var barTasks = tasks.map(function (t, i) {
     return convertToBarTask(t, i, dates, columnWidth, rowHeight, taskHeight, barCornerRadius, handleWidth, rtl, barProgressColor, barProgressSelectedColor, barBackgroundColor, barBackgroundSelectedColor, projectProgressColor, projectProgressSelectedColor, projectBackgroundColor, projectBackgroundSelectedColor, milestoneBackgroundColor, milestoneBackgroundSelectedColor);
@@ -1513,7 +1551,7 @@ var sortTasks = function sortTasks(taskA, taskB) {
   }
 };
 
-var styles$5 = {"barWrapper":"_KxSXS","barHandle":"_3w_5u","barBackground":"_31ERP"};
+var styles$6 = {"barWrapper":"_KxSXS","barHandle":"_3w_5u","barBackground":"_31ERP"};
 
 var BarDisplay = function BarDisplay(_ref) {
   var x = _ref.x,
@@ -1545,7 +1583,7 @@ var BarDisplay = function BarDisplay(_ref) {
     ry: barCornerRadius,
     rx: barCornerRadius,
     fill: getBarColor(),
-    className: styles$5.barBackground
+    className: styles$6.barBackground
   }), React__default.createElement("rect", {
     x: progressX,
     width: progressWidth,
@@ -1569,10 +1607,30 @@ var BarDateHandle = function BarDateHandle(_ref) {
     y: y,
     width: width,
     height: height,
-    className: styles$5.barHandle,
+    className: styles$6.barHandle,
     ry: barCornerRadius,
     rx: barCornerRadius,
     onMouseDown: onMouseDown
+  });
+};
+
+var stylesRelationHandle = {"barRelationHandleWrapper":"_2yAoi","barRelationHandle":"_E5hrM","barRelationHandle_drawMode":"_30bh6"};
+
+var BarRelationHandle = function BarRelationHandle(_ref) {
+  var _cx;
+
+  var x = _ref.x,
+      y = _ref.y,
+      radius = _ref.radius,
+      isRelationDrawMode = _ref.isRelationDrawMode,
+      onMouseDown = _ref.onMouseDown;
+  return React__default.createElement("circle", {
+    cx: x,
+    cy: y,
+    r: radius,
+    className: cx(stylesRelationHandle.barRelationHandle, (_cx = {}, _cx[stylesRelationHandle.barRelationHandle_drawMode] = isRelationDrawMode, _cx)),
+    onMouseDown: onMouseDown,
+    "data-draw-mode": isRelationDrawMode
   });
 };
 
@@ -1580,14 +1638,14 @@ var BarProgressHandle = function BarProgressHandle(_ref) {
   var progressPoint = _ref.progressPoint,
       onMouseDown = _ref.onMouseDown;
   return React__default.createElement("polygon", {
-    className: styles$5.barHandle,
+    className: styles$6.barHandle,
     points: progressPoint,
     onMouseDown: onMouseDown
   });
 };
 
 var _excluded = ["className"];
-var HtmlTooltip = styles$9.styled(function (_ref) {
+var HtmlTooltip = styles$a.styled(function (_ref) {
   var className = _ref.className,
       props = _objectWithoutPropertiesLoose(_ref, _excluded);
 
@@ -1609,16 +1667,28 @@ var HtmlTooltip = styles$9.styled(function (_ref) {
 });
 var Bar = function Bar(_ref3) {
   var task = _ref3.task,
+      taskHalfHeight = _ref3.taskHalfHeight,
+      relationCircleOffset = _ref3.relationCircleOffset,
+      relationCircleRadius = _ref3.relationCircleRadius,
       isProgressChangeable = _ref3.isProgressChangeable,
       isDateChangeable = _ref3.isDateChangeable,
+      isRelationChangeable = _ref3.isRelationChangeable,
+      isRelationDrawMode = _ref3.isRelationDrawMode,
       rtl = _ref3.rtl,
       onEventStart = _ref3.onEventStart,
+      onRelationStart = _ref3.onRelationStart,
       isSelected = _ref3.isSelected;
 
   var _useProvideChipColors = useProvideChipColors(),
       resolveChipColor = _useProvideChipColors.resolveChipColor,
       resolveChipLabelColor = _useProvideChipColors.resolveChipLabelColor;
 
+  var onLeftRelationTriggerMouseDown = React.useCallback(function () {
+    onRelationStart(rtl ? "endOfTask" : "startOfTask", task);
+  }, [onRelationStart, rtl, task]);
+  var onRightRelationTriggerMouseDown = React.useCallback(function () {
+    onRelationStart(rtl ? "startOfTask" : "endOfTask", task);
+  }, [onRelationStart, rtl, task]);
   var progressPoint = getProgressPoint(+!rtl * task.progressWidth + task.progressX, task.y, task.height);
   var handleHeight = task.height - 2;
 
@@ -1628,6 +1698,7 @@ var Bar = function Bar(_ref3) {
   });
 
   return React__default.createElement(HtmlTooltip, {
+    placement: "bottom-start",
     title: React__default.createElement(React__default.Fragment, null, React__default.createElement(material.Typography, {
       style: {
         textAlign: "center",
@@ -1639,14 +1710,14 @@ var Bar = function Bar(_ref3) {
         margin: "auto"
       }
     }, task.name)), React__default.createElement("pre", {
-      className: styles$5.tooltipDefaultContainerParagraph
+      className: styles$6.tooltipDefaultContainerParagraph
     }, task.start.getDate() + "." + (task.start.getMonth() + 1) + "." + task.start.getFullYear() + " - " + task.end.getDate() + "." + (task.end.getMonth() + 1) + "." + task.end.getFullYear()), task.end.getTime() - task.start.getTime() !== 0 && React__default.createElement("p", {
-      className: styles$5.tooltipDefaultContainerParagraph
+      className: styles$6.tooltipDefaultContainerParagraph
     }, "Duration: " + ~~((task.end.getTime() - task.start.getTime()) / (1000 * 60 * 60 * 24)) + " day(s)"), React__default.createElement("p", {
-      className: styles$5.tooltipDefaultContainerParagraph
+      className: styles$6.tooltipDefaultContainerParagraph
     }, !!task.progress && "Progress: " + task.progress + " %"))
   }, React__default.createElement("g", {
-    className: styles$5.barWrapper,
+    className: cx(styles$6.barWrapper, stylesRelationHandle.barRelationHandleWrapper),
     tabIndex: 0
   }, React__default.createElement(BarDisplay, {
     x: task.x1,
@@ -1681,6 +1752,18 @@ var Bar = function Bar(_ref3) {
     onMouseDown: function onMouseDown(e) {
       onEventStart("end", task, e);
     }
+  })), isRelationChangeable && React__default.createElement("g", null, React__default.createElement(BarRelationHandle, {
+    isRelationDrawMode: isRelationDrawMode,
+    x: task.x1 - relationCircleOffset,
+    y: task.y + taskHalfHeight,
+    radius: relationCircleRadius,
+    onMouseDown: onLeftRelationTriggerMouseDown
+  }), React__default.createElement(BarRelationHandle, {
+    isRelationDrawMode: isRelationDrawMode,
+    x: task.x2 + relationCircleOffset,
+    y: task.y + taskHalfHeight,
+    radius: relationCircleRadius,
+    onMouseDown: onRightRelationTriggerMouseDown
   })), isProgressChangeable && React__default.createElement(BarProgressHandle, {
     progressPoint: progressPoint,
     onMouseDown: function onMouseDown(e) {
@@ -1697,7 +1780,7 @@ var BarSmall = function BarSmall(_ref) {
       isSelected = _ref.isSelected;
   var progressPoint = getProgressPoint(task.progressWidth + task.x1, task.y, task.height);
   return React__default.createElement("g", {
-    className: styles$5.barWrapper,
+    className: styles$6.barWrapper,
     tabIndex: 0
   }, React__default.createElement(BarDisplay, {
     x: task.x1,
@@ -1722,12 +1805,18 @@ var BarSmall = function BarSmall(_ref) {
   })));
 };
 
-var styles$6 = {"milestoneWrapper":"_RRr13","milestoneBackground":"_2P2B1"};
+var styles$7 = {"milestoneWrapper":"_RRr13","milestoneBackground":"_2P2B1"};
 
 var Milestone = function Milestone(_ref) {
   var task = _ref.task,
+      taskHalfHeight = _ref.taskHalfHeight,
+      relationCircleOffset = _ref.relationCircleOffset,
+      relationCircleRadius = _ref.relationCircleRadius,
       isDateChangeable = _ref.isDateChangeable,
+      isRelationChangeable = _ref.isRelationChangeable,
+      isRelationDrawMode = _ref.isRelationDrawMode,
       onEventStart = _ref.onEventStart,
+      onRelationStart = _ref.onRelationStart,
       isSelected = _ref.isSelected;
 
   var _useProvideChipColors = useProvideChipColors(),
@@ -1742,7 +1831,7 @@ var Milestone = function Milestone(_ref) {
 
   return React__default.createElement("g", {
     tabIndex: 0,
-    className: styles$6.milestoneWrapper
+    className: cx(styles$7.milestoneWrapper, stylesRelationHandle.barRelationHandleWrapper)
   }, React__default.createElement("rect", {
     fill: getBarColor(),
     x: task.x1,
@@ -1752,14 +1841,32 @@ var Milestone = function Milestone(_ref) {
     rx: task.barCornerRadius,
     ry: task.barCornerRadius,
     transform: transform,
-    className: styles$6.milestoneBackground,
+    className: styles$7.milestoneBackground,
     onMouseDown: function onMouseDown(e) {
       isDateChangeable && onEventStart("move", task, e);
     }
-  }));
+  }), React__default.createElement("g", {
+    className: "handleGroup"
+  }, isRelationChangeable && React__default.createElement("g", null, React__default.createElement(BarRelationHandle, {
+    isRelationDrawMode: isRelationDrawMode,
+    x: task.x1 - relationCircleOffset,
+    y: task.y + taskHalfHeight,
+    radius: relationCircleRadius,
+    onMouseDown: function onMouseDown() {
+      onRelationStart("startOfTask", task);
+    }
+  }), React__default.createElement(BarRelationHandle, {
+    isRelationDrawMode: isRelationDrawMode,
+    x: task.x2 + relationCircleOffset,
+    y: task.y + taskHalfHeight,
+    radius: relationCircleRadius,
+    onMouseDown: function onMouseDown() {
+      onRelationStart("endOfTask", task);
+    }
+  }))));
 };
 
-var styles$7 = {"projectWrapper":"_1KJ6x","projectBackground":"_2RbVy","projectTop":"_2pZMF"};
+var styles$8 = {"projectWrapper":"_1KJ6x","projectBackground":"_2RbVy","projectTop":"_2pZMF"};
 
 var Project = function Project(_ref) {
   var task = _ref.task;
@@ -1787,18 +1894,19 @@ var Project = function Project(_ref) {
         maxWidth: "235px",
         whiteSpace: "nowrap",
         overflow: "hidden",
-        textOverflow: "ellipsis"
+        textOverflow: "ellipsis",
+        textAlign: "center"
       }
     }, task.name)), React__default.createElement("pre", {
-      className: styles$7.tooltipDefaultContainerParagraph
+      className: styles$8.tooltipDefaultContainerParagraph
     }, task.start.getDate() + "." + (task.start.getMonth() + 1) + "." + task.start.getFullYear() + " - " + task.end.getDate() + "." + (task.end.getMonth() + 1) + "." + task.end.getFullYear()), task.end.getTime() - task.start.getTime() !== 0 && React__default.createElement("p", {
-      className: styles$7.tooltipDefaultContainerParagraph
+      className: styles$8.tooltipDefaultContainerParagraph
     }, "Duration: " + ~~((task.end.getTime() - task.start.getTime()) / (1000 * 60 * 60 * 24)) + " day(s)"), React__default.createElement("p", {
-      className: styles$7.tooltipDefaultContainerParagraph
+      className: styles$8.tooltipDefaultContainerParagraph
     }, !!task.progress && "Progress: " + task.progress + " %"))
   }, React__default.createElement("g", {
     tabIndex: 0,
-    className: styles$7.projectWrapper
+    className: styles$8.projectWrapper
   }, React__default.createElement("rect", {
     fill: resolveChipColor(task.color, "test"),
     x: task.x1,
@@ -1807,7 +1915,7 @@ var Project = function Project(_ref) {
     height: 5,
     rx: task.barCornerRadius,
     ry: task.barCornerRadius,
-    className: styles$7.projectBackground
+    className: styles$8.projectBackground
   }), React__default.createElement("rect", {
     x: task.progressX,
     width: task.progressWidth,
@@ -1822,15 +1930,14 @@ var Project = function Project(_ref) {
 var style = {"barLabel":"_3zRJQ","barLabelOutside":"_3KcaM"};
 
 var TaskItem = function TaskItem(props) {
-  var _props = _extends({}, props),
-      task = _props.task,
-      arrowIndent = _props.arrowIndent,
-      isDelete = _props.isDelete,
-      taskHeight = _props.taskHeight,
-      isSelected = _props.isSelected,
-      rtl = _props.rtl,
-      onEventStart = _props.onEventStart;
-
+  var task = props.task,
+      arrowIndent = props.arrowIndent,
+      isDelete = props.isDelete,
+      taskHeight = props.taskHeight,
+      isSelected = props.isSelected,
+      isRelationDrawMode = props.isRelationDrawMode,
+      rtl = props.rtl,
+      onEventStart = props.onEventStart;
   var textRef = React.useRef(null);
 
   var _useState = React.useState(React__default.createElement("div", null)),
@@ -1859,7 +1966,7 @@ var TaskItem = function TaskItem(props) {
         setTaskItem(React__default.createElement(Bar, Object.assign({}, props)));
         break;
     }
-  }, [task, isSelected]);
+  }, [task, isSelected, isRelationDrawMode]);
   React.useEffect(function () {
     if (textRef.current) {
       setIsTextInside(textRef.current.getBBox().width < task.x2 - task.x1);
@@ -1922,21 +2029,27 @@ var TaskGanttContent = function TaskGanttContent(_ref) {
   var tasks = _ref.tasks,
       dates = _ref.dates,
       ganttEvent = _ref.ganttEvent,
+      ganttRelationEvent = _ref.ganttRelationEvent,
       selectedTask = _ref.selectedTask,
       rowHeight = _ref.rowHeight,
       columnWidth = _ref.columnWidth,
       timeStep = _ref.timeStep,
       svg = _ref.svg,
       taskHeight = _ref.taskHeight,
+      taskHalfHeight = _ref.taskHalfHeight,
+      relationCircleOffset = _ref.relationCircleOffset,
+      relationCircleRadius = _ref.relationCircleRadius,
       arrowColor = _ref.arrowColor,
       arrowIndent = _ref.arrowIndent,
       fontFamily = _ref.fontFamily,
       fontSize = _ref.fontSize,
       rtl = _ref.rtl,
       setGanttEvent = _ref.setGanttEvent,
+      setGanttRelationEvent = _ref.setGanttRelationEvent,
       setFailedTask = _ref.setFailedTask,
       setSelectedTask = _ref.setSelectedTask,
       onDateChange = _ref.onDateChange,
+      onRelationChange = _ref.onRelationChange,
       onProgressChange = _ref.onProgressChange,
       onDoubleClick = _ref.onDoubleClick,
       onClick = _ref.onClick,
@@ -2063,6 +2176,75 @@ var TaskGanttContent = function TaskGanttContent(_ref) {
       setIsMoving(true);
     }
   }, [ganttEvent, xStep, initEventX1Delta, onProgressChange, timeStep, onDateChange, svg, isMoving, point, rtl, setFailedTask, setGanttEvent]);
+  var startRelationTarget = ganttRelationEvent === null || ganttRelationEvent === void 0 ? void 0 : ganttRelationEvent.target;
+  var startRelationTask = ganttRelationEvent === null || ganttRelationEvent === void 0 ? void 0 : ganttRelationEvent.task;
+  React.useEffect(function () {
+    if (!onRelationChange || !startRelationTarget || !startRelationTask) {
+      return undefined;
+    }
+
+    var svgNode = svg === null || svg === void 0 ? void 0 : svg.current;
+
+    if (!svgNode) {
+      return undefined;
+    }
+
+    if (!point) {
+      return undefined;
+    }
+
+    var handleMouseMove = function handleMouseMove(event) {
+      var clientX = event.clientX,
+          clientY = event.clientY;
+      point.x = clientX;
+      point.y = clientY;
+      var ctm = svgNode.getScreenCTM();
+
+      if (!ctm) {
+        return;
+      }
+
+      var svgP = point.matrixTransform(ctm.inverse());
+      setGanttRelationEvent(function (prevValue) {
+        if (!prevValue) {
+          return null;
+        }
+
+        return _extends({}, prevValue, {
+          endX: svgP.x,
+          endY: svgP.y
+        });
+      });
+    };
+
+    var handleMouseUp = function handleMouseUp(event) {
+      var clientX = event.clientX,
+          clientY = event.clientY;
+      point.x = clientX;
+      point.y = clientY;
+      var ctm = svgNode.getScreenCTM();
+
+      if (!ctm) {
+        return;
+      }
+
+      var svgP = point.matrixTransform(ctm.inverse());
+      var endTargetRelationCircle = getRelationCircleByCoordinates(svgP, tasks, taskHalfHeight, relationCircleOffset, relationCircleRadius, rtl);
+
+      if (endTargetRelationCircle) {
+        onRelationChange([startRelationTask, startRelationTarget], endTargetRelationCircle);
+      }
+
+      setGanttRelationEvent(null);
+    };
+
+    svgNode.addEventListener("mousemove", handleMouseMove);
+    svgNode.addEventListener("mouseup", handleMouseUp);
+    return function () {
+      svgNode.removeEventListener("mousemove", handleMouseMove);
+      svgNode.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [svg, rtl, point, startRelationTarget, startRelationTask, setGanttRelationEvent, tasks, taskHalfHeight, relationCircleOffset, relationCircleRadius, onRelationChange]);
 
   var handleBarEventStart = function handleBarEventStart(action, task, event) {
     try {
@@ -2143,6 +2325,18 @@ var TaskGanttContent = function TaskGanttContent(_ref) {
     }
   };
 
+  var handleBarRelationStart = React.useCallback(function (target, task) {
+    var startX = target === "startOfTask" !== rtl ? task.x1 - 10 : task.x2 + 10;
+    var startY = task.y + Math.round(task.height / 2);
+    setGanttRelationEvent({
+      target: target,
+      task: task,
+      startX: startX,
+      startY: startY,
+      endX: startX,
+      endY: startY
+    });
+  }, [setGanttRelationEvent, rtl]);
   return React__default.createElement("g", {
     className: "content"
   }, React__default.createElement("g", {
@@ -2170,18 +2364,29 @@ var TaskGanttContent = function TaskGanttContent(_ref) {
       task: task,
       arrowIndent: arrowIndent,
       taskHeight: taskHeight,
+      taskHalfHeight: taskHalfHeight,
+      relationCircleOffset: relationCircleOffset,
+      relationCircleRadius: relationCircleRadius,
+      isRelationDrawMode: Boolean(ganttRelationEvent),
       isProgressChangeable: !!onProgressChange && !task.isDisabled,
       isDateChangeable: !!onDateChange && !task.isDisabled,
+      isRelationChangeable: !!onRelationChange && !task.isDisabled,
       isDelete: !task.isDisabled,
       onEventStart: handleBarEventStart,
+      onRelationStart: handleBarRelationStart,
       key: task.id,
       isSelected: !!selectedTask && task.id === selectedTask.id,
       rtl: rtl
     });
-  })));
+  })), ganttRelationEvent && React__default.createElement(RelationLine, {
+    x1: ganttRelationEvent.startX,
+    x2: ganttRelationEvent.endX,
+    y1: ganttRelationEvent.startY,
+    y2: ganttRelationEvent.endY
+  }));
 };
 
-var styles$8 = {"ganttVerticalContainer":"_CZjuD","ganttVerticalContainerChanged":"_15X0H","horizontalContainer":"_2B2zv","horizontalContainerChanged":"_1zqJ8","wrapper":"_3eULf"};
+var styles$9 = {"ganttVerticalContainer":"_CZjuD","ganttVerticalContainerChanged":"_15X0H","horizontalContainer":"_2B2zv","horizontalContainerChanged":"_1zqJ8","wrapper":"_3eULf"};
 
 var TaskGantt = function TaskGantt(_ref) {
   var gridProps = _ref.gridProps,
@@ -2209,7 +2414,7 @@ var TaskGantt = function TaskGantt(_ref) {
     }
   }, [scrollX]);
   return React__default.createElement("div", {
-    className: styles$8.ganttVerticalContainerChanged,
+    className: styles$9.ganttVerticalContainerChanged,
     ref: verticalGanttContainerRef,
     dir: "ltr"
   }, React__default.createElement("svg", {
@@ -2219,7 +2424,7 @@ var TaskGantt = function TaskGantt(_ref) {
     fontFamily: barProps.fontFamily
   }, React__default.createElement(Calendar, Object.assign({}, calendarProps))), React__default.createElement("div", {
     ref: horizontalContainerRef,
-    className: styles$8.horizontalContainer,
+    className: styles$9.horizontalContainer,
     style: ganttHeight ? {
       height: ganttHeight,
       width: gridProps.svgWidth
@@ -2245,6 +2450,10 @@ var Gantt = function Gantt(_ref) {
       listCellWidth = _ref$listCellWidth === void 0 ? "155px" : _ref$listCellWidth,
       _ref$rowHeight = _ref.rowHeight,
       rowHeight = _ref$rowHeight === void 0 ? 50 : _ref$rowHeight,
+      _ref$relationCircleOf = _ref.relationCircleOffset,
+      relationCircleOffset = _ref$relationCircleOf === void 0 ? 10 : _ref$relationCircleOf,
+      _ref$relationCircleRa = _ref.relationCircleRadius,
+      relationCircleRadius = _ref$relationCircleRa === void 0 ? 5 : _ref$relationCircleRa,
       _ref$ganttHeight = _ref.ganttHeight,
       ganttHeight = _ref$ganttHeight === void 0 ? 0 : _ref$ganttHeight,
       _ref$viewMode = _ref.viewMode,
@@ -2299,6 +2508,7 @@ var Gantt = function Gantt(_ref) {
       _ref$TaskListTable = _ref.TaskListTable,
       TaskListTable = _ref$TaskListTable === void 0 ? TaskListTableDefault : _ref$TaskListTable,
       onDateChange = _ref.onDateChange,
+      onRelationChange = _ref.onRelationChange,
       onProgressChange = _ref.onProgressChange,
       onDoubleClick = _ref.onDoubleClick,
       onClick = _ref.onClick,
@@ -2335,32 +2545,39 @@ var Gantt = function Gantt(_ref) {
       ganttEvent = _useState4[0],
       setGanttEvent = _useState4[1];
 
+  var _useState5 = React.useState(null),
+      ganttRelationEvent = _useState5[0],
+      setGanttRelationEvent = _useState5[1];
+
   var taskHeight = React.useMemo(function () {
     return rowHeight * barFill / 100;
   }, [rowHeight, barFill]);
+  var taskHalfHeight = React.useMemo(function () {
+    return Math.round(taskHeight / 2);
+  }, [taskHeight]);
 
-  var _useState5 = React.useState(),
-      selectedTask = _useState5[0],
-      setSelectedTask = _useState5[1];
+  var _useState6 = React.useState(),
+      selectedTask = _useState6[0],
+      setSelectedTask = _useState6[1];
 
-  var _useState6 = React.useState(null),
-      failedTask = _useState6[0],
-      setFailedTask = _useState6[1];
+  var _useState7 = React.useState(null),
+      failedTask = _useState7[0],
+      setFailedTask = _useState7[1];
 
   var svgWidth = dateSetup.dates.length * columnWidth;
   var ganttFullHeight = barTasks.length * rowHeight;
 
-  var _useState7 = React.useState(0),
-      scrollY = _useState7[0],
-      setScrollY = _useState7[1];
+  var _useState8 = React.useState(0),
+      scrollY = _useState8[0],
+      setScrollY = _useState8[1];
 
-  var _useState8 = React.useState(-1),
-      scrollX = _useState8[0],
-      setScrollX = _useState8[1];
+  var _useState9 = React.useState(-1),
+      scrollX = _useState9[0],
+      setScrollX = _useState9[1];
 
-  var _useState9 = React.useState(false),
-      ignoreScrollEvent = _useState9[0],
-      setIgnoreScrollEvent = _useState9[1];
+  var _useState10 = React.useState(false),
+      ignoreScrollEvent = _useState10[0],
+      setIgnoreScrollEvent = _useState10[1];
 
   React.useEffect(function () {
     var filteredTasks;
@@ -2598,9 +2815,13 @@ var Gantt = function Gantt(_ref) {
     tasks: barTasks,
     dates: dateSetup.dates,
     ganttEvent: ganttEvent,
+    ganttRelationEvent: ganttRelationEvent,
     selectedTask: selectedTask,
     rowHeight: rowHeight,
     taskHeight: taskHeight,
+    taskHalfHeight: taskHalfHeight,
+    relationCircleOffset: relationCircleOffset,
+    relationCircleRadius: relationCircleRadius,
     columnWidth: columnWidth,
     arrowColor: arrowColor,
     timeStep: timeStep,
@@ -2610,9 +2831,11 @@ var Gantt = function Gantt(_ref) {
     svgWidth: svgWidth,
     rtl: rtl,
     setGanttEvent: setGanttEvent,
+    setGanttRelationEvent: setGanttRelationEvent,
     setFailedTask: setFailedTask,
     setSelectedTask: handleSelectedTask,
     onDateChange: onDateChange,
+    onRelationChange: onRelationChange,
     onProgressChange: onProgressChange,
     onDoubleClick: onDoubleClick,
     onClick: onClick,
@@ -2628,7 +2851,7 @@ var Gantt = function Gantt(_ref) {
     headerHeight: headerHeight,
     scrollY: scrollY,
     ganttHeight: ganttHeight,
-    horizontalContainerClass: styles$8.horizontalContainer,
+    horizontalContainerClass: styles$9.horizontalContainer,
     selectedTask: selectedTask,
     taskListRef: taskListRef,
     setSelectedTask: handleSelectedTask,
@@ -2637,7 +2860,7 @@ var Gantt = function Gantt(_ref) {
     TaskListTable: TaskListTable
   };
   return React__default.createElement("div", null, React__default.createElement("div", {
-    className: styles$8.wrapper,
+    className: styles$9.wrapper,
     onKeyDown: handleKeyDown,
     tabIndex: 0,
     ref: wrapperRef
