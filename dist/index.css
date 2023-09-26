@@ -168,7 +168,7 @@
   fill: #ddd;
   cursor: ew-resize;
   opacity: 0;
-  visibility: hidden;
+  visibility: visible;
 }
 
 ._31ERP {
