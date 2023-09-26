@@ -1758,6 +1758,7 @@ var Bar = function Bar(_ref3) {
 
   return React__default.createElement(HtmlTooltip, {
     placement: "bottom-start",
+    followCursor: true,
     title: React__default.createElement(React__default.Fragment, null, React__default.createElement(material.Typography, {
       style: {
         textAlign: "center",
@@ -1936,6 +1937,7 @@ var Project = function Project(_ref) {
 
   var projectWith = task.x2 - task.x1;
   return React__default.createElement(HtmlTooltip, {
+    followCursor: true,
     title: React__default.createElement(React__default.Fragment, null, React__default.createElement("div", {
       style: {
         margin: "auto"
