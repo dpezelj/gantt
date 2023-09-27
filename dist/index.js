@@ -4,6 +4,7 @@ var React = require('react');
 var React__default = _interopDefault(React);
 var ChevronRightIcon = _interopDefault(require('@mui/icons-material/ChevronRight'));
 var ExpandMoreIcon = _interopDefault(require('@mui/icons-material/ExpandMore'));
+var cx = _interopDefault(require('classnames'));
 var material = require('@mui/material');
 var styles$a = require('@mui/material/styles');
 
@@ -1550,66 +1551,6 @@ var sortTasks = function sortTasks(taskA, taskB) {
   }
 };
 
-function createCommonjsModule(fn, module) {
-	return module = { exports: {} }, fn(module, module.exports), module.exports;
-}
-
-var classnames = createCommonjsModule(function (module) {
-/*!
-	Copyright (c) 2018 Jed Watson.
-	Licensed under the MIT License (MIT), see
-	http://jedwatson.github.io/classnames
-*/
-/* global define */
-
-(function () {
-
-	var hasOwn = {}.hasOwnProperty;
-
-	function classNames() {
-		var classes = [];
-
-		for (var i = 0; i < arguments.length; i++) {
-			var arg = arguments[i];
-			if (!arg) continue;
-
-			var argType = typeof arg;
-
-			if (argType === 'string' || argType === 'number') {
-				classes.push(arg);
-			} else if (Array.isArray(arg)) {
-				if (arg.length) {
-					var inner = classNames.apply(null, arg);
-					if (inner) {
-						classes.push(inner);
-					}
-				}
-			} else if (argType === 'object') {
-				if (arg.toString !== Object.prototype.toString && !arg.toString.toString().includes('[native code]')) {
-					classes.push(arg.toString());
-					continue;
-				}
-
-				for (var key in arg) {
-					if (hasOwn.call(arg, key) && arg[key]) {
-						classes.push(key);
-					}
-				}
-			}
-		}
-
-		return classes.join(' ');
-	}
-
-	if ( module.exports) {
-		classNames.default = classNames;
-		module.exports = classNames;
-	} else {
-		window.classNames = classNames;
-	}
-}());
-});
-
 var styles$6 = {"barWrapper":"_KxSXS","barHandle":"_3w_5u","barBackground":"_31ERP"};
 
 var BarDisplay = function BarDisplay(_ref) {
@@ -1687,7 +1628,7 @@ var BarRelationHandle = function BarRelationHandle(_ref) {
     cx: x,
     cy: y,
     r: radius,
-    className: classnames(stylesRelationHandle.barRelationHandle, (_cx = {}, _cx[stylesRelationHandle.barRelationHandle_drawMode] = isRelationDrawMode, _cx)),
+    className: cx(stylesRelationHandle.barRelationHandle, (_cx = {}, _cx[stylesRelationHandle.barRelationHandle_drawMode] = isRelationDrawMode, _cx)),
     onMouseDown: onMouseDown,
     "data-draw-mode": isRelationDrawMode
   });
@@ -1737,6 +1678,7 @@ var Bar = function Bar(_ref3) {
       onEventStart = _ref3.onEventStart,
       onRelationStart = _ref3.onRelationStart,
       isSelected = _ref3.isSelected;
+  var x = false;
 
   var _useProvideChipColors = useProvideChipColors(),
       resolveChipColor = _useProvideChipColors.resolveChipColor,
@@ -1777,7 +1719,7 @@ var Bar = function Bar(_ref3) {
       className: styles$6.tooltipDefaultContainerParagraph
     }, !!task.progress && "Progress: " + task.progress + " %"))
   }, React__default.createElement("g", {
-    className: classnames(styles$6.barWrapper, stylesRelationHandle.barRelationHandleWrapper),
+    className: cx(styles$6.barWrapper, stylesRelationHandle.barRelationHandleWrapper),
     tabIndex: 0
   }, React__default.createElement(BarDisplay, {
     x: task.x1,
@@ -1824,7 +1766,7 @@ var Bar = function Bar(_ref3) {
     y: task.y + taskHalfHeight,
     radius: relationCircleRadius,
     onMouseDown: onRightRelationTriggerMouseDown
-  })), isProgressChangeable && React__default.createElement(BarProgressHandle, {
+  })), isProgressChangeable && x && React__default.createElement(BarProgressHandle, {
     progressPoint: progressPoint,
     onMouseDown: function onMouseDown(e) {
       onEventStart("progress", task, e);
@@ -1838,7 +1780,19 @@ var BarSmall = function BarSmall(_ref) {
       isDateChangeable = _ref.isDateChangeable,
       onEventStart = _ref.onEventStart,
       isSelected = _ref.isSelected;
+  var x = false;
+
+  var _useProvideChipColors = useProvideChipColors(),
+      resolveChipColor = _useProvideChipColors.resolveChipColor,
+      resolveChipLabelColor = _useProvideChipColors.resolveChipLabelColor;
+
   var progressPoint = getProgressPoint(task.progressWidth + task.x1, task.y, task.height);
+
+  var taskStyle = _extends({}, task.styles, {
+    backgroundColor: resolveChipLabelColor(task.color, "test") || "#ededed",
+    backgroundSelectedColor: resolveChipColor(task.color, "test") || "#ededed"
+  });
+
   return React__default.createElement("g", {
     className: styles$6.barWrapper,
     tabIndex: 0
@@ -1850,14 +1804,14 @@ var BarSmall = function BarSmall(_ref) {
     progressX: task.progressX,
     progressWidth: task.progressWidth,
     barCornerRadius: task.barCornerRadius,
-    styles: task.styles,
+    styles: taskStyle,
     isSelected: isSelected,
     onMouseDown: function onMouseDown(e) {
       isDateChangeable && onEventStart("move", task, e);
     }
   }), React__default.createElement("g", {
     className: "handleGroup"
-  }, isProgressChangeable && React__default.createElement(BarProgressHandle, {
+  }, isProgressChangeable && x && React__default.createElement(BarProgressHandle, {
     progressPoint: progressPoint,
     onMouseDown: function onMouseDown(e) {
       onEventStart("progress", task, e);
@@ -1891,7 +1845,7 @@ var Milestone = function Milestone(_ref) {
 
   return React__default.createElement("g", {
     tabIndex: 0,
-    className: classnames(styles$7.milestoneWrapper, stylesRelationHandle.barRelationHandleWrapper)
+    className: cx(styles$7.milestoneWrapper, stylesRelationHandle.barRelationHandleWrapper)
   }, React__default.createElement("rect", {
     fill: getBarColor(),
     x: task.x1,
