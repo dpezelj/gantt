@@ -1833,51 +1833,6 @@ var Bar = function Bar(_ref3) {
   }))));
 };
 
-var BarSmall = function BarSmall(_ref) {
-  var task = _ref.task,
-      isProgressChangeable = _ref.isProgressChangeable,
-      isDateChangeable = _ref.isDateChangeable,
-      onEventStart = _ref.onEventStart,
-      isSelected = _ref.isSelected;
-  var x = false;
-
-  var _useProvideChipColors = useProvideChipColors(),
-      resolveChipColor = _useProvideChipColors.resolveChipColor,
-      resolveChipLabelColor = _useProvideChipColors.resolveChipLabelColor;
-
-  var progressPoint = getProgressPoint(task.progressWidth + task.x1, task.y, task.height);
-
-  var taskStyle = _extends({}, task.styles, {
-    backgroundColor: resolveChipLabelColor(task.color, "test") || "#ededed",
-    backgroundSelectedColor: resolveChipColor(task.color, "test") || "#ededed"
-  });
-
-  return React__default.createElement("g", {
-    className: styles$6.barWrapper,
-    tabIndex: 0
-  }, React__default.createElement(BarDisplay, {
-    x: task.x1,
-    y: task.y,
-    width: task.x2 - task.x1,
-    height: task.height,
-    progressX: task.progressX,
-    progressWidth: task.progressWidth,
-    barCornerRadius: task.barCornerRadius,
-    styles: taskStyle,
-    isSelected: isSelected,
-    onMouseDown: function onMouseDown(e) {
-      isDateChangeable && onEventStart("move", task, e);
-    }
-  }), React__default.createElement("g", {
-    className: "handleGroup"
-  }, isProgressChangeable && x && React__default.createElement(BarProgressHandle, {
-    progressPoint: progressPoint,
-    onMouseDown: function onMouseDown(e) {
-      onEventStart("progress", task, e);
-    }
-  })));
-};
-
 var styles$7 = {"milestoneWrapper":"_RRr13","milestoneBackground":"_2P2B1"};
 
 var Milestone = function Milestone(_ref) {
@@ -2030,10 +1985,6 @@ var TaskItem = function TaskItem(props) {
 
       case "project":
         setTaskItem(React__default.createElement(Project, Object.assign({}, props)));
-        break;
-
-      case "smalltask":
-        setTaskItem(React__default.createElement(BarSmall, Object.assign({}, props)));
         break;
 
       default:
