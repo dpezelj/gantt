@@ -1624,10 +1624,6 @@ var BarDisplay = function BarDisplay(_ref) {
       styles = _ref.styles,
       onMouseDown = _ref.onMouseDown;
 
-  var getProcessColor = function getProcessColor() {
-    return isSelected ? styles.progressSelectedColor : styles.progressColor;
-  };
-
   var getBarColor = function getBarColor() {
     return isSelected ? styles.backgroundSelectedColor : styles.backgroundColor;
   };
@@ -1646,11 +1642,11 @@ var BarDisplay = function BarDisplay(_ref) {
   }), React__default.createElement("rect", {
     x: progressX,
     width: progressWidth,
-    y: y,
-    height: height,
+    y: y + 0.2,
+    height: height - 0.5,
     ry: barCornerRadius,
     rx: barCornerRadius,
-    fill: getProcessColor()
+    fill: "green"
   }));
 };
 
@@ -1786,7 +1782,7 @@ var Bar = function Bar(_ref3) {
     width: task.x2 - task.x1,
     height: 15,
     progressX: task.progressX,
-    progressWidth: 0,
+    progressWidth: task.progressWidth,
     barCornerRadius: task.barCornerRadius,
     styles: taskStyle,
     isSelected: isSelected,
