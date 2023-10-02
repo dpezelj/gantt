@@ -1622,11 +1622,6 @@ var BarDisplay = function BarDisplay(_ref) {
       barCornerRadius = _ref.barCornerRadius,
       styles = _ref.styles,
       onMouseDown = _ref.onMouseDown;
-
-  var getBarColor = function getBarColor() {
-    return isSelected ? styles.backgroundSelectedColor : styles.backgroundColor;
-  };
-
   return React.createElement("g", {
     onMouseDown: onMouseDown
   }, React.createElement("rect", {
@@ -1636,7 +1631,7 @@ var BarDisplay = function BarDisplay(_ref) {
     height: height,
     ry: barCornerRadius,
     rx: barCornerRadius,
-    fill: getBarColor(),
+    fill: styles.backgroundSelectedColor,
     className: styles$6.barBackground
   }), React.createElement("rect", {
     x: progressX,
@@ -1645,7 +1640,7 @@ var BarDisplay = function BarDisplay(_ref) {
     height: height - 0.5,
     ry: barCornerRadius,
     rx: barCornerRadius,
-    fill: "green"
+    fill: isSelected ? styles.backgroundColor : styles.backgroundColor
   }));
 };
 
