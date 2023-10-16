@@ -1339,9 +1339,13 @@ var moveByX = function moveByX(x, xStep, task) {
   return [newX1, newX2];
 };
 
-var moveByXForEach = function moveByXForEach(x, xStep, task, newMoveX1, t) {
+var moveByXForEach = function moveByXForEach(x, xStep, task, newMoveX1, t, selectedTask) {
   var taskOffset = task.offset || 0;
   var prevTaskOffset = t.offset || 0;
+  var selectedTaskOffset = selectedTask.offset || 0;
+  var newTaskOffset = taskOffset - selectedTaskOffset;
+  console.log("SELECTEDTASK", selectedTask.name);
+  console.log("NEWTASKOFFSET", newTaskOffset);
   var finalOffset = taskOffset - prevTaskOffset;
   console.log("OFFSET FINAL", task.name, taskOffset, prevTaskOffset, finalOffset, newMoveX1);
   console.log("TESTING TSK", t.id, t.name, t.x1, t.x2, newMoveX1);
@@ -1351,7 +1355,7 @@ var moveByXForEach = function moveByXForEach(x, xStep, task, newMoveX1, t) {
   var additionalXValue = steps * xStep;
   console.log("RES", t.name, newMoveX1 + (t.x2 - t.x1) + (task.x1 - t.x2) + additionalXValue, additionalXValue, newMoveX1);
   console.log("POZIV");
-  var newX1Test = newMoveX1 + taskOffset;
+  var newX1Test = newMoveX1 + newTaskOffset;
   var newX2Test = newX1Test + task.x2 - task.x1;
   console.log("TASK MOVEX", task.id, newX1Test, newX2Test);
   return {
@@ -1472,11 +1476,23 @@ var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(s
     case "move":
       {
         var _moveByX = moveByX(svgX - initEventX1Delta, xStep, selectedTask),
-            newMoveX1 = _moveByX[0];
+            newMoveX1 = _moveByX[0],
+            newMoveX2 = _moveByX[1];
 
         isChanged = newMoveX1 !== selectedTask.x1;
 
         if (isChanged) {
+          changedTask.start = dateByX(newMoveX1, selectedTask.x1, selectedTask.start, xStep, timeStep);
+          changedTask.end = dateByX(newMoveX2, selectedTask.x2, selectedTask.end, xStep, timeStep);
+          changedTask.x1 = newMoveX1;
+          changedTask.x2 = newMoveX2;
+
+          var _progressWithByParams5 = progressWithByParams(changedTask.x1, changedTask.x2, changedTask.progress, rtl),
+              _progressWidth3 = _progressWithByParams5[0],
+              _progressX3 = _progressWithByParams5[1];
+
+          changedTask.progressWidth = _progressWidth3;
+          changedTask.progressX = _progressX3;
           var _changedTasks = [];
 
           if (changedTask.barChildren.length !== 0) {
@@ -1485,11 +1501,11 @@ var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(s
             console.log("TESTTASKS", tasks);
             var tasksTest = tasks.filter(function (t) {
               return childrenIds.includes(t.id);
-            }).filter(function (task, index) {
+            }).map(function (task, index) {
               console.log("TNAME", task.name);
               console.log("OFFSETY", task.offset);
 
-              var _moveByXForEach = moveByXForEach(svgX - initEventX1Delta, xStep, task, newMoveX1, index === 0 ? selectedTask : tasks[index - 1]),
+              var _moveByXForEach = moveByXForEach(svgX - initEventX1Delta, xStep, task, newMoveX1, index === 0 ? selectedTask : tasks[index - 1], selectedTask),
                   newX1Test = _moveByXForEach.newX1Test,
                   newX2Test = _moveByXForEach.newX2Test;
 
@@ -1501,9 +1517,9 @@ var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(s
               task.x1 = newX1Test;
               task.x2 = newX2Test;
 
-              var _progressWithByParams5 = progressWithByParams(task.x1, task.x2, task.progress, rtl),
-                  progressWidth = _progressWithByParams5[0],
-                  progressX = _progressWithByParams5[1];
+              var _progressWithByParams6 = progressWithByParams(task.x1, task.x2, task.progress, rtl),
+                  progressWidth = _progressWithByParams6[0],
+                  progressX = _progressWithByParams6[1];
 
               task.progressWidth = progressWidth;
               task.progressX = progressX;
