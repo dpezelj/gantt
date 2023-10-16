@@ -8,7 +8,8 @@ export declare const getProgressPoint: (progressX: number, taskY: number, taskHe
 /**
  * Method handles event in real time(mousemove) and on finish(mouseup)
  */
-export declare const handleTaskBySVGMouseEvent: (svgX: number, action: BarMoveAction, selectedTask: BarTask, xStep: number, timeStep: number, initEventX1Delta: number, rtl: boolean) => {
+export declare const handleTaskBySVGMouseEvent: (svgX: number, action: BarMoveAction, selectedTask: BarTask, tasks: BarTask[], xStep: number, timeStep: number, initEventX1Delta: number, rtl: boolean) => {
     isChanged: boolean;
     changedTask: BarTask;
+    changedTasks: BarTask[];
 };

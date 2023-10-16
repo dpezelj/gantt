@@ -3,6 +3,7 @@ export declare type BarMoveAction = "progress" | "end" | "start" | "move";
 export declare type GanttContentMoveAction = "mouseenter" | "mouseleave" | "delete" | "dblclick" | "click" | "select" | "" | BarMoveAction;
 export declare type GanttEvent = {
     changedTask?: BarTask;
+    changedTasks?: BarTask[];
     originalSelectedTask?: BarTask;
     action: GanttContentMoveAction;
 };
