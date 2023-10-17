@@ -1465,6 +1465,7 @@ var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(s
         isChanged = newMoveX1 !== selectedTask.x1;
 
         if (isChanged) {
+          console.log("IZVODI SE");
           changedTask.start = dateByX(newMoveX1, selectedTask.x1, selectedTask.start, xStep, timeStep);
           changedTask.end = dateByX(newMoveX2, selectedTask.x2, selectedTask.end, xStep, timeStep);
           changedTask.x1 = newMoveX1;
@@ -1476,8 +1477,10 @@ var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(s
 
           changedTask.progressWidth = _progressWidth3;
           changedTask.progressX = _progressX3;
+          console.log("IZVODI SE", changedTask);
           var childrenIds = getAllBarChildrenIds(changedTask);
-          tasks.filter(function (t) {
+          var copyTasks = tasks;
+          copyTasks.filter(function (t) {
             return childrenIds.includes(t.id);
           }).map(function (task) {
             var _moveByXForEach = moveByXForEach(task, newMoveX1, selectedTask),
@@ -1502,7 +1505,6 @@ var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(s
       }
   }
 
-  console.log("CHANGED TASKS", changedTasks);
   return {
     isChanged: isChanged,
     changedTask: changedTask,
@@ -2186,6 +2188,7 @@ var TaskGanttContent = function TaskGanttContent(_ref) {
             changedTasks = _handleTaskBySVGMouse.changedTasks;
 
         if (isChanged) {
+          console.log("CHT", changedTask);
           setGanttEvent({
             action: ganttEvent.action,
             changedTask: changedTask,
@@ -2220,24 +2223,30 @@ var TaskGanttContent = function TaskGanttContent(_ref) {
         var _handleTaskBySVGMouse2 = handleTaskBySVGMouseEvent(cursor.x, action, changedTask, tasks, xStep, timeStep, initEventX1Delta, rtl),
             newChangedTask = _handleTaskBySVGMouse2.changedTask;
 
-        var isNotLikeOriginal = originalSelectedTask.start !== newChangedTask.start || originalSelectedTask.end !== newChangedTask.end || originalSelectedTask.progress !== newChangedTask.progress;
+        var isNotLikeOriginal = originalSelectedTask.start !== newChangedTask.start || originalSelectedTask.prevEnd !== newChangedTask.end || originalSelectedTask.progress !== newChangedTask.progress;
         svg.current.removeEventListener("mousemove", handleMouseMove);
         svg.current.removeEventListener("mouseup", handleMouseUp);
         setGanttEvent({
           action: ""
         });
         setIsMoving(false);
+        console.log("NCT", newChangedTask);
         var operationSuccess = true;
+        console.log("CONDITION", originalSelectedTask.start, newChangedTask.start);
 
         var _temp7 = function () {
           if ((action === "move" || action === "end" || action === "start") && onDateChange && isNotLikeOriginal) {
             var _temp8 = _catch(function () {
               return Promise.resolve(onDateChange(newChangedTask, newChangedTask.barChildren)).then(function (result) {
+                console.log("RESULT CONTENT", result);
+
                 if (result !== undefined) {
+                  console.log("SUCCESS");
                   operationSuccess = result;
                 }
               });
             }, function () {
+              console.log("ERROR");
               operationSuccess = false;
             });
 

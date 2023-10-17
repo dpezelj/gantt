@@ -18,6 +18,8 @@ export interface Task {
     name: string;
     start: Date;
     end: Date;
+    prevStart?: Date;
+    prevEnd?: Date;
     /**
      * From 0 to 100
      */
