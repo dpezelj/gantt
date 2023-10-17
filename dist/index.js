@@ -1331,33 +1331,21 @@ var endByX = function endByX(x, xStep, task) {
   return newX;
 };
 
-var moveByX = function moveByX(x, xStep, task) {
+var moveByX = function moveByX(x, xStep, task, prevTask) {
   var steps = Math.round((x - task.x1) / xStep);
   var additionalXValue = steps * xStep;
   var newX1 = task.x1 + additionalXValue;
+  newX1 = prevTask ? newX1 < prevTask.x2 ? prevTask.x2 : newX1 : newX1;
   var newX2 = newX1 + task.x2 - task.x1;
   return [newX1, newX2];
 };
 
-var moveByXForEach = function moveByXForEach(x, xStep, task, newMoveX1, t, selectedTask) {
+var moveByXForEach = function moveByXForEach(task, newMoveX1, selectedTask) {
   var taskOffset = task.offset || 0;
-  var prevTaskOffset = t.offset || 0;
   var selectedTaskOffset = selectedTask.offset || 0;
   var newTaskOffset = taskOffset - selectedTaskOffset;
-  console.log("SELECTEDTASK", selectedTask.name);
-  console.log("NEWTASKOFFSET", newTaskOffset);
-  var finalOffset = taskOffset - prevTaskOffset;
-  console.log("OFFSET FINAL", task.name, taskOffset, prevTaskOffset, finalOffset, newMoveX1);
-  console.log("TESTING TSK", t.id, t.name, t.x1, t.x2, newMoveX1);
-  console.log("TESTING MOVE", t.name, t.x1, t.x2, task.name, task.x1);
-  console.log("OFFSET MOVE", task.offset);
-  var steps = Math.round((x - task.x1) / xStep);
-  var additionalXValue = steps * xStep;
-  console.log("RES", t.name, newMoveX1 + (t.x2 - t.x1) + (task.x1 - t.x2) + additionalXValue, additionalXValue, newMoveX1);
-  console.log("POZIV");
   var newX1Test = newMoveX1 + newTaskOffset;
   var newX2Test = newX1Test + task.x2 - task.x1;
-  console.log("TASK MOVEX", task.id, newX1Test, newX2Test);
   return {
     newX1Test: newX1Test,
     newX2Test: newX2Test
@@ -1375,32 +1363,24 @@ var handleTaskBySVGMouseEvent = function handleTaskBySVGMouseEvent(svgX, action,
 
   switch (selectedTask.type) {
     case "milestone":
-      result = handleTaskBySVGMouseEventForMilestone(svgX, action, selectedTask, xStep, timeStep, initEventX1Delta);
+      result = handleTaskBySVGMouseEventForMilestone(svgX, action, selectedTask, tasks, xStep, timeStep, initEventX1Delta);
       break;
 
     default:
       console.log("MOVING");
-      var startX = selectedTask.x1;
-      result = handleTaskBySVGMouseEventForBar(svgX, action, selectedTask, tasks, xStep, timeStep, initEventX1Delta, rtl, startX);
+      result = handleTaskBySVGMouseEventForBar(svgX, action, selectedTask, tasks, xStep, timeStep, initEventX1Delta, rtl);
       break;
   }
 
   return result;
 };
 
-var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(svgX, action, selectedTask, tasks, xStep, timeStep, initEventX1Delta, rtl, startX) {
+var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(svgX, action, selectedTask, tasks, xStep, timeStep, initEventX1Delta, rtl) {
   var changedTasks = [];
 
   var changedTask = _extends({}, selectedTask);
 
   var isChanged = false;
-  console.log("START X", svgX - startX);
-  console.log("INIT DELTA", initEventX1Delta);
-  console.log("SELECTED X1", selectedTask.x1, changedTask.x1);
-  console.log("SELECTED TEST", tasks.filter(function (t) {
-    return selectedTask.id === t.id;
-  }));
-  console.log(tasks);
 
   switch (action) {
     case "progress":
@@ -1455,10 +1435,8 @@ var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(s
 
         if (isChanged) {
           if (rtl) {
-            console.log("RTL");
             changedTask.start = dateByX(newX2, selectedTask.x2, selectedTask.start, xStep, timeStep);
           } else {
-            console.log("LTR");
             changedTask.end = dateByX(newX2, selectedTask.x2, selectedTask.end, xStep, timeStep);
           }
 
@@ -1475,7 +1453,13 @@ var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(s
 
     case "move":
       {
-        var _moveByX = moveByX(svgX - initEventX1Delta, xStep, selectedTask),
+        var prevDependentTask = tasks.filter(function (item) {
+          var _selectedTask$depende;
+
+          return (_selectedTask$depende = selectedTask.dependencies) === null || _selectedTask$depende === void 0 ? void 0 : _selectedTask$depende.includes(item.id);
+        }).pop();
+
+        var _moveByX = moveByX(svgX - initEventX1Delta, xStep, selectedTask, prevDependentTask),
             newMoveX1 = _moveByX[0],
             newMoveX2 = _moveByX[1];
 
@@ -1493,46 +1477,29 @@ var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(s
 
           changedTask.progressWidth = _progressWidth3;
           changedTask.progressX = _progressX3;
-          var _changedTasks = [];
+          var childrenIds = getAllBarChildrenIds(changedTask);
+          tasks.filter(function (t) {
+            return childrenIds.includes(t.id);
+          }).map(function (task) {
+            var _moveByXForEach = moveByXForEach(task, newMoveX1, selectedTask),
+                newX1Test = _moveByXForEach.newX1Test,
+                newX2Test = _moveByXForEach.newX2Test;
 
-          if (changedTask.barChildren.length !== 0) {
-            var childrenIds = getAllBarChildrenIds(changedTask);
-            console.log(childrenIds);
-            console.log("TESTTASKS", tasks);
-            var tasksTest = tasks.filter(function (t) {
-              return childrenIds.includes(t.id);
-            }).map(function (task, index) {
-              console.log("TNAME", task.name);
-              console.log("OFFSETY", task.offset);
+            task.start = dateByX(newX1Test, task.x1, task.start, xStep, timeStep);
+            task.end = dateByX(newX2Test, task.x2, task.end, xStep, timeStep);
+            task.x1 = newX1Test;
+            task.x2 = newX2Test;
 
-              var _moveByXForEach = moveByXForEach(svgX - initEventX1Delta, xStep, task, newMoveX1, index === 0 ? selectedTask : tasks[index - 1], selectedTask),
-                  newX1Test = _moveByXForEach.newX1Test,
-                  newX2Test = _moveByXForEach.newX2Test;
+            var _progressWithByParams6 = progressWithByParams(task.x1, task.x2, task.progress, rtl),
+                progressWidth = _progressWithByParams6[0],
+                progressX = _progressWithByParams6[1];
 
-              console.log("TESTING", task, childrenIds);
-              console.log("MOVEX", newX1Test, newX2Test);
-              console.log("TNAME", task.name, newX1Test, newX2Test);
-              task.start = dateByX(newX1Test, task.x1, task.start, xStep, timeStep);
-              task.end = dateByX(newX2Test, task.x2, task.end, xStep, timeStep);
-              task.x1 = newX1Test;
-              task.x2 = newX2Test;
-
-              var _progressWithByParams6 = progressWithByParams(task.x1, task.x2, task.progress, rtl),
-                  progressWidth = _progressWithByParams6[0],
-                  progressX = _progressWithByParams6[1];
-
-              task.progressWidth = progressWidth;
-              task.progressX = progressX;
-
-              _changedTasks.push(task);
-
-              return task;
-            });
-            console.log("TESTTASKSTEST", tasksTest);
-          }
+            task.progressWidth = progressWidth;
+            task.progressX = progressX;
+            changedTasks.push(task);
+            return task;
+          });
         }
-
-        break;
       }
   }
 
@@ -1544,7 +1511,7 @@ var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(s
   };
 };
 
-var handleTaskBySVGMouseEventForMilestone = function handleTaskBySVGMouseEventForMilestone(svgX, action, selectedTask, xStep, timeStep, initEventX1Delta) {
+var handleTaskBySVGMouseEventForMilestone = function handleTaskBySVGMouseEventForMilestone(svgX, action, selectedTask, tasks, xStep, timeStep, initEventX1Delta) {
   var changedTasks = [];
 
   var changedTask = _extends({}, selectedTask);
@@ -1554,7 +1521,12 @@ var handleTaskBySVGMouseEventForMilestone = function handleTaskBySVGMouseEventFo
   switch (action) {
     case "move":
       {
-        var _moveByX2 = moveByX(svgX - initEventX1Delta, xStep, selectedTask),
+        var prevTaskIndex = tasks.findIndex(function (task) {
+          return task.id === selectedTask.id;
+        }) - 1;
+        var prevTask = tasks[prevTaskIndex];
+
+        var _moveByX2 = moveByX(svgX - initEventX1Delta, xStep, selectedTask, prevTask),
             newMoveX1 = _moveByX2[0],
             newMoveX2 = _moveByX2[1];
 
@@ -2769,9 +2741,35 @@ var Gantt = function Gantt(_ref) {
           return t.id !== changedTask.id;
         }));
       } else if (action === "move" || action === "end" || action === "start" || action === "progress") {
-        if ((changedTasks === null || changedTasks === void 0 ? void 0 : changedTasks.length) !== 0 && (changedTasks === null || changedTasks === void 0 ? void 0 : changedTasks.length) !== undefined) {
-          setBarTasks(changedTasks);
-          console.log("BAR TASKS", barTasks);
+        var prevStateTask = barTasks.find(function (t) {
+          return t.id === changedTask.id;
+        });
+
+        if (prevStateTask && (prevStateTask.start.getTime() !== changedTask.start.getTime() || prevStateTask.end.getTime() !== changedTask.end.getTime() || prevStateTask.progress !== changedTask.progress)) {
+          var newTaskList = barTasks.map(function (t) {
+            return t.id === changedTask.id ? changedTask : t;
+          });
+          console.log("CHANGED TASKS", changedTasks);
+          setBarTasks(newTaskList);
+
+          if ((changedTasks === null || changedTasks === void 0 ? void 0 : changedTasks.length) !== 0 && (changedTasks === null || changedTasks === void 0 ? void 0 : changedTasks.length) !== undefined) {
+            console.log("CHANGED TASKSTEST", changedTasks);
+            var mergedArray = barTasks.map(function (barTask) {
+              var changedItem = changedTasks.find(function (item) {
+                return item.id === barTask.id;
+              });
+
+              if (changedItem) {
+                return _extends({}, barTask, changedItem, {
+                  offset: changedItem.x1 - barTasks[1].x1
+                });
+              } else {
+                return barTask;
+              }
+            });
+            setBarTasks(mergedArray);
+            console.log("BAR TASKS", mergedArray);
+          }
         }
       }
     }
