@@ -1135,10 +1135,9 @@ var convertToBarTasks = function convertToBarTasks(tasks, dates, columnWidth, ro
 
       if (dependence !== -1) {
         barTasks[dependence].barChildren.push(task);
-        task.offset = task.x1 - barTasks[1].x1;
-      } else {
-        task.offset = 0;
       }
+
+      task.offset = task.x1 - barTasks[1].x1;
     };
 
     for (var j = 0; j < dependencies.length; j++) {
