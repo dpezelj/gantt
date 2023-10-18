@@ -1479,8 +1479,7 @@ var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(s
           changedTask.progressX = _progressX3;
           console.log("IZVODI SE", changedTask);
           var childrenIds = getAllBarChildrenIds(changedTask);
-          var copyTasks = tasks;
-          copyTasks.filter(function (t) {
+          tasks.filter(function (t) {
             return childrenIds.includes(t.id);
           }).map(function (task) {
             var _moveByXForEach = moveByXForEach(task, newMoveX1, selectedTask),
@@ -1505,6 +1504,7 @@ var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(s
       }
   }
 
+  console.log("CODE 1", changedTasks);
   return {
     isChanged: isChanged,
     changedTask: changedTask,
@@ -2221,7 +2221,8 @@ var TaskGanttContent = function TaskGanttContent(_ref) {
         var cursor = point.matrixTransform(svg === null || svg === void 0 ? void 0 : (_svg$current$getScree2 = svg.current.getScreenCTM()) === null || _svg$current$getScree2 === void 0 ? void 0 : _svg$current$getScree2.inverse());
 
         var _handleTaskBySVGMouse2 = handleTaskBySVGMouseEvent(cursor.x, action, changedTask, tasks, xStep, timeStep, initEventX1Delta, rtl),
-            newChangedTask = _handleTaskBySVGMouse2.changedTask;
+            newChangedTask = _handleTaskBySVGMouse2.changedTask,
+            changedTasks = _handleTaskBySVGMouse2.changedTasks;
 
         var isNotLikeOriginal = originalSelectedTask.start !== newChangedTask.start || originalSelectedTask.prevEnd !== newChangedTask.end || originalSelectedTask.progress !== newChangedTask.progress;
         svg.current.removeEventListener("mousemove", handleMouseMove);
@@ -2237,7 +2238,8 @@ var TaskGanttContent = function TaskGanttContent(_ref) {
         var _temp7 = function () {
           if ((action === "move" || action === "end" || action === "start") && onDateChange && isNotLikeOriginal) {
             var _temp8 = _catch(function () {
-              return Promise.resolve(onDateChange(newChangedTask, newChangedTask.barChildren)).then(function (result) {
+              console.log("CODE0", newChangedTask);
+              return Promise.resolve(onDateChange(newChangedTask, newChangedTask.barChildren, changedTasks)).then(function (result) {
                 console.log("RESULT CONTENT", result);
 
                 if (result !== undefined) {
@@ -2754,11 +2756,7 @@ var Gantt = function Gantt(_ref) {
         });
 
         if (prevStateTask && (prevStateTask.start.getTime() !== changedTask.start.getTime() || prevStateTask.end.getTime() !== changedTask.end.getTime() || prevStateTask.progress !== changedTask.progress)) {
-          var newTaskList = barTasks.map(function (t) {
-            return t.id === changedTask.id ? changedTask : t;
-          });
           console.log("CHANGED TASKS", changedTasks);
-          setBarTasks(newTaskList);
 
           if ((changedTasks === null || changedTasks === void 0 ? void 0 : changedTasks.length) !== 0 && (changedTasks === null || changedTasks === void 0 ? void 0 : changedTasks.length) !== undefined) {
             console.log("CHANGED TASKSTEST", changedTasks);
@@ -2766,17 +2764,22 @@ var Gantt = function Gantt(_ref) {
               var changedItem = changedTasks.find(function (item) {
                 return item.id === barTask.id;
               });
+              console.log("CHITM", changedItem);
 
               if (changedItem) {
-                return _extends({}, barTask, changedItem, {
-                  offset: changedItem.x1 - barTasks[1].x1
-                });
+                console.log(_extends({}, barTask, changedItem));
+                return _extends({}, barTask, changedItem);
               } else {
                 return barTask;
               }
             });
             setBarTasks(mergedArray);
             console.log("BAR TASKS", mergedArray);
+          } else {
+            var newTaskList = barTasks.map(function (t) {
+              return t.id === changedTask.id ? changedTask : t;
+            });
+            setBarTasks(newTaskList);
           }
         }
       }

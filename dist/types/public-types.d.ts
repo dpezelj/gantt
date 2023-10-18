@@ -1,4 +1,5 @@
 /// <reference types="react" />
+import { BarTask } from "./bar-task";
 import { RelationMoveTarget } from "./gantt-task-actions";
 export declare enum ViewMode {
     Hour = "Hour",
@@ -57,7 +58,7 @@ export interface EventOption {
     /**
      * Invokes on end and start time change. Chart undoes operation if method return false or error.
      */
-    onDateChange?: (task: Task, children: Task[]) => void | boolean | Promise<void> | Promise<boolean>;
+    onDateChange?: (task: Task, children: BarTask[], changedTasks: BarTask[]) => void | boolean | Promise<void> | Promise<boolean>;
     /**
      * Invokes new relation between tasks
      */
