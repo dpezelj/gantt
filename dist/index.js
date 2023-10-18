@@ -1128,6 +1128,7 @@ var convertToBarTasks = function convertToBarTasks(tasks, dates, columnWidth, ro
   console.log("BARTASKS", barTasks);
   barTasks = barTasks.map(function (task) {
     var dependencies = task.dependencies || [];
+    task.offset = task.x1 - barTasks[1].x1;
 
     var _loop = function _loop(j) {
       var dependence = barTasks.findIndex(function (value) {
@@ -1137,8 +1138,6 @@ var convertToBarTasks = function convertToBarTasks(tasks, dates, columnWidth, ro
       if (dependence !== -1) {
         barTasks[dependence].barChildren.push(task);
       }
-
-      task.offset = task.x1 - barTasks[1].x1;
     };
 
     for (var j = 0; j < dependencies.length; j++) {
