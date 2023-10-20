@@ -1361,7 +1361,7 @@ var handleTaskBySVGMouseEvent = function handleTaskBySVGMouseEvent(svgX, action,
 
   switch (selectedTask.type) {
     case "milestone":
-      result = handleTaskBySVGMouseEventForMilestone(svgX, action, selectedTask, tasks, xStep, timeStep, initEventX1Delta);
+      result = handleTaskBySVGMouseEventForMilestone(svgX, action, selectedTask, tasks, xStep, timeStep, initEventX1Delta, rtl);
       break;
 
     default:
@@ -1511,7 +1511,7 @@ var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(s
   };
 };
 
-var handleTaskBySVGMouseEventForMilestone = function handleTaskBySVGMouseEventForMilestone(svgX, action, selectedTask, tasks, xStep, timeStep, initEventX1Delta) {
+var handleTaskBySVGMouseEventForMilestone = function handleTaskBySVGMouseEventForMilestone(svgX, action, selectedTask, tasks, xStep, timeStep, initEventX1Delta, rtl) {
   var changedTasks = [];
 
   var changedTask = _extends({}, selectedTask);
@@ -1521,25 +1521,51 @@ var handleTaskBySVGMouseEventForMilestone = function handleTaskBySVGMouseEventFo
   switch (action) {
     case "move":
       {
-        var prevTaskIndex = tasks.findIndex(function (task) {
-          return task.id === selectedTask.id;
-        }) - 1;
-        var prevTask = tasks[prevTaskIndex];
+        var prevDependentTask = tasks.filter(function (item) {
+          var _selectedTask$depende2;
 
-        var _moveByX2 = moveByX(svgX - initEventX1Delta, xStep, selectedTask, prevTask),
+          return (_selectedTask$depende2 = selectedTask.dependencies) === null || _selectedTask$depende2 === void 0 ? void 0 : _selectedTask$depende2.includes(item.id);
+        }).pop();
+
+        var _moveByX2 = moveByX(svgX - initEventX1Delta, xStep, selectedTask, prevDependentTask),
             newMoveX1 = _moveByX2[0],
             newMoveX2 = _moveByX2[1];
 
         isChanged = newMoveX1 !== selectedTask.x1;
 
         if (isChanged) {
+          console.log("IZVODI SE");
           changedTask.start = dateByX(newMoveX1, selectedTask.x1, selectedTask.start, xStep, timeStep);
-          changedTask.end = changedTask.start;
+          changedTask.end = dateByX(newMoveX2, selectedTask.x2, selectedTask.end, xStep, timeStep);
           changedTask.x1 = newMoveX1;
           changedTask.x2 = newMoveX2;
-        }
+          console.log("IZVODI SE", changedTask);
+          var childrenIds = getAllBarChildrenIds(changedTask);
+          tasks.filter(function (t) {
+            return childrenIds.includes(t.id);
+          }).map(function (task) {
+            var _moveByXForEach2 = moveByXForEach(task, newMoveX1, selectedTask),
+                newX1Test = _moveByXForEach2.newX1Test,
+                newX2Test = _moveByXForEach2.newX2Test;
 
-        break;
+            task.start = dateByX(newX1Test, task.x1, task.start, xStep, timeStep);
+            task.end = dateByX(newX2Test, task.x2, task.end, xStep, timeStep);
+            task.x1 = newX1Test;
+            task.x2 = newX2Test;
+
+            if (task.type === "task") {
+              var _progressWithByParams7 = progressWithByParams(task.x1, task.x2, task.progress, rtl),
+                  progressWidth = _progressWithByParams7[0],
+                  progressX = _progressWithByParams7[1];
+
+              task.progressWidth = progressWidth;
+              task.progressX = progressX;
+            }
+
+            changedTasks.push(task);
+            return task;
+          });
+        }
       }
   }
 
