@@ -120,6 +120,21 @@
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  font-weight: bold;
+  user-select: none;
+  pointer-events: none;
+  font-size: 12px;
+  color: #333;
+}
+
+._2Nl1I {
+  text-anchor: middle;
+  fill: #333;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  font-weight: bold;
   user-select: none;
   pointer-events: none;
   font-size: 12px;
@@ -137,6 +152,7 @@
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  font-weight: bold;
   user-select: none;
   pointer-events: none;
 }

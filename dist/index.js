@@ -304,7 +304,8 @@ var TaskListHeaderDefault = function TaskListHeaderDefault(_ref) {
   }), React__default.createElement("div", {
     className: styles.ganttTable_HeaderItem,
     style: {
-      minWidth: rowWidth
+      minWidth: rowWidth,
+      textAlign: "center"
     }
   }), React__default.createElement("div", {
     className: styles.ganttTable_HeaderSeparator,
@@ -678,7 +679,7 @@ var Grid = function Grid(props) {
   }, React__default.createElement(GridBody, Object.assign({}, props)));
 };
 
-var styles$4 = {"calendarBottomText":"_9w8d5","calendarTopTick":"_1rLuZ","calendarTopText":"_2q1Kt","calendarHeader":"_35nLX"};
+var styles$4 = {"calendarBottomText":"_9w8d5","calendarMiddleText":"_2Nl1I","calendarTopTick":"_1rLuZ","calendarTopText":"_2q1Kt","calendarHeader":"_35nLX"};
 
 var TopPartOfCalendar = function TopPartOfCalendar(_ref) {
   var value = _ref.value,
@@ -754,6 +755,14 @@ var Calendar = function Calendar(_ref) {
     return [topValues, bottomValues];
   };
 
+  function getWeekNumber(d) {
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    var weekNo = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+    return weekNo;
+  }
+
   var getCalendarValuesForMonth = function getCalendarValuesForMonth() {
     var topValues = [];
     var bottomValues = [];
@@ -809,7 +818,7 @@ var Calendar = function Calendar(_ref) {
         topValue = getLocaleMonth(date, locale) + ", " + date.getFullYear();
       }
 
-      var bottomValue = "W" + getWeekNumberISO8601(date);
+      var bottomValue = "WH " + getWeekNumberISO8601(date);
       bottomValues.push(React__default.createElement("text", {
         key: date.getTime(),
         y: headerHeight * 0.8,
@@ -842,24 +851,37 @@ var Calendar = function Calendar(_ref) {
   var getCalendarValuesForDay = function getCalendarValuesForDay() {
     var topValues = [];
     var bottomValues = [];
+    var middleValues = [];
     var topDefaultHeight = headerHeight * 0.5;
     var dates = dateSetup.dates;
 
     for (var i = 0; i < dates.length; i++) {
       var date = dates[i];
+      var weekNumber = getWeekNumber(date);
+      var middleValue = "WH " + weekNumber;
+
+      if (date.getDay() === 1) {
+        middleValues.push(React__default.createElement("text", {
+          key: date.getTime() + "middle",
+          y: headerHeight * 0.65,
+          x: columnWidth * i + columnWidth * 0.55,
+          className: styles$4.calendarMiddleText
+        }, middleValue));
+      }
+
       var bottomValue = date.toLocaleDateString(locale, {
         day: "2-digit",
         month: "2-digit"
       });
       bottomValues.push(React__default.createElement("text", {
         key: date.getTime(),
-        y: headerHeight * 0.8,
+        y: headerHeight * 0.9,
         x: columnWidth * i + columnWidth * 0.5,
         className: styles$4.calendarBottomText
       }, bottomValue.split("/").join(".")));
 
       if (i + 1 !== dates.length && date.getMonth() !== dates[i + 1].getMonth()) {
-        var topValue = getLocaleMonth(date, locale) + ", " + date.getFullYear();
+        var topValue = getLocaleMonth(date, locale).toUpperCase() + ", " + date.getFullYear();
         topValues.push(React__default.createElement(TopPartOfCalendar, {
           key: topValue + date.getFullYear(),
           value: topValue,
@@ -872,7 +894,7 @@ var Calendar = function Calendar(_ref) {
       }
     }
 
-    return [topValues, bottomValues];
+    return [topValues, bottomValues, middleValues];
   };
 
   var getCalendarValuesForPartOfDay = function getCalendarValuesForPartOfDay() {
@@ -952,6 +974,7 @@ var Calendar = function Calendar(_ref) {
 
   var topValues = [];
   var bottomValues = [];
+  var middleValues = [];
 
   switch (dateSetup.viewMode) {
     case exports.ViewMode.Year:
@@ -980,6 +1003,7 @@ var Calendar = function Calendar(_ref) {
 
       topValues = _getCalendarValuesFor4[0];
       bottomValues = _getCalendarValuesFor4[1];
+      middleValues = _getCalendarValuesFor4[2];
       break;
 
     case exports.ViewMode.QuarterDay:
@@ -1007,7 +1031,7 @@ var Calendar = function Calendar(_ref) {
     width: columnWidth * dateSetup.dates.length,
     height: headerHeight,
     className: styles$4.calendarHeader
-  }), bottomValues, " ", topValues);
+  }), bottomValues, " ", middleValues, " ", topValues);
 };
 
 // A type of promise-like that resolves synchronously and supports only one observer
@@ -1128,7 +1152,6 @@ var convertToBarTasks = function convertToBarTasks(tasks, dates, columnWidth, ro
   console.log("BARTASKS", barTasks);
   barTasks = barTasks.map(function (task) {
     var dependencies = task.dependencies || [];
-    task.offset = task.x1 - barTasks[1].x1;
 
     var _loop = function _loop(j) {
       var dependence = barTasks.findIndex(function (value) {
@@ -1137,6 +1160,9 @@ var convertToBarTasks = function convertToBarTasks(tasks, dates, columnWidth, ro
 
       if (dependence !== -1) {
         barTasks[dependence].barChildren.push(task);
+        task.offset = task.x1 - barTasks[1].x1;
+      } else {
+        task.offset = 0;
       }
     };
 
@@ -1361,7 +1387,7 @@ var handleTaskBySVGMouseEvent = function handleTaskBySVGMouseEvent(svgX, action,
 
   switch (selectedTask.type) {
     case "milestone":
-      result = handleTaskBySVGMouseEventForMilestone(svgX, action, selectedTask, tasks, xStep, timeStep, initEventX1Delta, rtl);
+      result = handleTaskBySVGMouseEventForMilestone(svgX, action, selectedTask, tasks, xStep, timeStep, initEventX1Delta);
       break;
 
     default:
@@ -1511,7 +1537,7 @@ var handleTaskBySVGMouseEventForBar = function handleTaskBySVGMouseEventForBar(s
   };
 };
 
-var handleTaskBySVGMouseEventForMilestone = function handleTaskBySVGMouseEventForMilestone(svgX, action, selectedTask, tasks, xStep, timeStep, initEventX1Delta, rtl) {
+var handleTaskBySVGMouseEventForMilestone = function handleTaskBySVGMouseEventForMilestone(svgX, action, selectedTask, tasks, xStep, timeStep, initEventX1Delta) {
   var changedTasks = [];
 
   var changedTask = _extends({}, selectedTask);
@@ -1521,51 +1547,25 @@ var handleTaskBySVGMouseEventForMilestone = function handleTaskBySVGMouseEventFo
   switch (action) {
     case "move":
       {
-        var prevDependentTask = tasks.filter(function (item) {
-          var _selectedTask$depende2;
+        var prevTaskIndex = tasks.findIndex(function (task) {
+          return task.id === selectedTask.id;
+        }) - 1;
+        var prevTask = tasks[prevTaskIndex];
 
-          return (_selectedTask$depende2 = selectedTask.dependencies) === null || _selectedTask$depende2 === void 0 ? void 0 : _selectedTask$depende2.includes(item.id);
-        }).pop();
-
-        var _moveByX2 = moveByX(svgX - initEventX1Delta, xStep, selectedTask, prevDependentTask),
+        var _moveByX2 = moveByX(svgX - initEventX1Delta, xStep, selectedTask, prevTask),
             newMoveX1 = _moveByX2[0],
             newMoveX2 = _moveByX2[1];
 
         isChanged = newMoveX1 !== selectedTask.x1;
 
         if (isChanged) {
-          console.log("IZVODI SE");
           changedTask.start = dateByX(newMoveX1, selectedTask.x1, selectedTask.start, xStep, timeStep);
-          changedTask.end = dateByX(newMoveX2, selectedTask.x2, selectedTask.end, xStep, timeStep);
+          changedTask.end = changedTask.start;
           changedTask.x1 = newMoveX1;
           changedTask.x2 = newMoveX2;
-          console.log("IZVODI SE", changedTask);
-          var childrenIds = getAllBarChildrenIds(changedTask);
-          tasks.filter(function (t) {
-            return childrenIds.includes(t.id);
-          }).map(function (task) {
-            var _moveByXForEach2 = moveByXForEach(task, newMoveX1, selectedTask),
-                newX1Test = _moveByXForEach2.newX1Test,
-                newX2Test = _moveByXForEach2.newX2Test;
-
-            task.start = dateByX(newX1Test, task.x1, task.start, xStep, timeStep);
-            task.end = dateByX(newX2Test, task.x2, task.end, xStep, timeStep);
-            task.x1 = newX1Test;
-            task.x2 = newX2Test;
-
-            if (task.type === "task") {
-              var _progressWithByParams7 = progressWithByParams(task.x1, task.x2, task.progress, rtl),
-                  progressWidth = _progressWithByParams7[0],
-                  progressX = _progressWithByParams7[1];
-
-              task.progressWidth = progressWidth;
-              task.progressX = progressX;
-            }
-
-            changedTasks.push(task);
-            return task;
-          });
         }
+
+        break;
       }
   }
 
